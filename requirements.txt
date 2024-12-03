@@ -1,29 +1,11 @@
-# Core dependencies
-streamlit==1.32.0
-streamlit-webrtc==0.47.1
-python-dotenv==1.0.1
-
-# Audio handling
-gTTS==2.5.1
-pygame==2.5.2
-pydub==0.25.1
-
-# AI and Language Models
-langchain==0.1.0
-langchain-core==0.1.0
-langchain-community==0.0.13
-langchain-groq==0.2.1
-google-generativeai==0.3.2
-
-# Vector Store
-faiss-cpu==1.7.4
-
-# Utility packages
-numpy==1.24.3
-pandas==2.0.3
-requests==2.31.0
-typing-extensions==4.8.0
-python-magic==0.4.27
-
-# Optional
-watchdog==3.0.0
+streamlit
+streamlit-webrtc
+numpy
+pandas
+google-generativeai
+langchain
+langchain-groq
+faiss-cpu
+gTTS
+pydub
+watchdog
