@@ -1,8 +1,3 @@
-[Full code was too long - continuing with Part 2 of 2]
-
-Here's the first part of the complete code:
-
-```python
 import streamlit as st
 import speech_recognition as sr
 from streamlit_webrtc import webrtc_streamer, WebRtcMode
