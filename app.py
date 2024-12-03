@@ -10,12 +10,10 @@ from langchain_groq import ChatGroq
 from langchain.agents import create_react_agent, AgentExecutor
 from langchain.tools import Tool
 
-# Custom CSS for luxury styling
+# Luxury styling
 LUXURY_STYLE = """
 <style>
-    .main {
-        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-    }
+    .main { background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); }
     
     .luxury-container {
         background: linear-gradient(145deg, rgba(26, 26, 26, 0.9) 0%, rgba(45, 45, 45, 0.9) 100%);
@@ -35,7 +33,6 @@ LUXURY_STYLE = """
         text-align: center;
         margin-bottom: 2rem;
         padding: 2rem 0;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     }
     
     .luxury-subheader {
@@ -56,14 +53,6 @@ LUXURY_STYLE = """
         font-family: 'Cormorant Garamond', serif;
         font-size: 1.2rem;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(184, 134, 11, 0.2);
-    }
-    
-    .stButton button:hover {
-        background: linear-gradient(145deg, #B8860B, #DAA520);
-        color: #1a1a1a;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(184, 134, 11, 0.3);
     }
     
     .chat-message {
@@ -71,24 +60,7 @@ LUXURY_STYLE = """
         margin: 0.5rem 0;
         border-radius: 10px;
         font-family: 'Cormorant Garamond', serif;
-    }
-    
-    .user-message {
-        background: linear-gradient(145deg, rgba(184, 134, 11, 0.1), rgba(218, 165, 32, 0.1));
-        border-left: 3px solid #B8860B;
-    }
-    
-    .assistant-message {
-        background: linear-gradient(145deg, rgba(45, 45, 45, 0.9), rgba(26, 26, 26, 0.9));
-        border-right: 3px solid #DAA520;
-    }
-    
-    .stAudio {
-        background: linear-gradient(145deg, #1a1a1a, #2d2d2d);
-        border-radius: 10px;
-        padding: 1rem;
-        margin: 1rem 0;
-        border: 1px solid #B8860B;
+        color: #DAA520;
     }
     
     .status-indicator {
@@ -97,11 +69,7 @@ LUXURY_STYLE = """
         border-radius: 50%;
         display: inline-block;
         margin-right: 10px;
-    }
-    
-    .status-active {
         background: #DAA520;
-        box-shadow: 0 0 10px #B8860B;
         animation: pulse 1.5s infinite;
     }
     
@@ -110,132 +78,89 @@ LUXURY_STYLE = """
         50% { transform: scale(1.2); opacity: 0.7; }
         100% { transform: scale(1); opacity: 1; }
     }
-    
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: #1a1a1a; }
-    ::-webkit-scrollbar-thumb { 
-        background: #B8860B; 
-        border-radius: 4px; 
-    }
-    ::-webkit-scrollbar-thumb:hover { background: #DAA520; }
-
-    /* WebRTC elements styling */
-    .streamlit-webrtc-container {
-        background: transparent !important;
-    }
-    
-    video {
-        display: none !important;
-    }
-    
-    .streamlit-webrtc-container button {
-        background: linear-gradient(145deg, #1a1a1a, #2d2d2d) !important;
-        color: #DAA520 !important;
-        border: 2px solid #B8860B !important;
-        border-radius: 50px !important;
-        padding: 0.5rem 1.5rem !important;
-        font-family: 'Cormorant Garamond', serif !important;
-        transition: all 0.3s ease !important;
-    }
-    
-    .streamlit-webrtc-container button:hover {
-        background: linear-gradient(145deg, #B8860B, #DAA520) !important;
-        color: #1a1a1a !important;
-    }
 </style>
-
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 """
 
 class AudioProcessor:
     def __init__(self):
-        self.audio_chunks: List[np.ndarray] = []
+        self.chunks = []
         self.recording = False
-        self.sample_rate = 16000
 
-    def process_audio(self, frame: av.AudioFrame) -> av.AudioFrame:
+    def process_audio(self, frame):
         if self.recording:
-            audio_array = frame.to_ndarray()
-            self.audio_chunks.append(audio_array)
+            sound = frame.to_ndarray()
+            self.chunks.append(sound)
         return frame
 
-def text_to_speech(text: str) -> str:
-    try:
-        tts = gTTS(text, lang='en')
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as temp_file:
-            tts.save(temp_file.name)
-            return temp_file.name
-    except Exception as e:
-        st.error(f"Text-to-speech error: {str(e)}")
-        return None
+def create_audio_processor():
+    return AudioProcessor()
 
 def main():
     st.set_page_config(
-        page_title="LeChateau Concierge",
+        page_title="LeChateau Voice Concierge",
         page_icon="👑",
         layout="wide",
         initial_sidebar_state="collapsed"
     )
     
+    # Inject custom styling
     st.markdown(LUXURY_STYLE, unsafe_allow_html=True)
     
-    st.markdown('<div class="luxury-header">LeChateau Concierge</div>', unsafe_allow_html=True)
+    # Header
+    st.markdown('<div class="luxury-header">LeChateau Voice Concierge</div>', unsafe_allow_html=True)
     st.markdown('<div class="luxury-subheader">Your Personal Reservation Assistant</div>', unsafe_allow_html=True)
 
-    if 'audio_processor' not in st.session_state:
-        st.session_state.audio_processor = AudioProcessor()
+    # Initialize chat history
     if 'messages' not in st.session_state:
         st.session_state.messages = []
 
+    # Main content columns
     col1, col2 = st.columns([2, 1])
 
     with col1:
         st.markdown('<div class="luxury-container">', unsafe_allow_html=True)
         
-        recording_col1, recording_col2 = st.columns([3, 1])
-        
-        with recording_col1:
-            webrtc_ctx = webrtc_streamer(
-                key="voice-recorder",
-                media_stream_constraints={
-                    "audio": True,
-                    "video": False
-                },
-                audio_processor_factory=lambda: st.session_state.audio_processor,
-                rtc_configuration={
-                    "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
-                },
-                translations={
-                    "start": "🎙️ Start Recording",
-                    "stop": "⏹️ Stop Recording",
-                    "select_device": "Select Audio Device"
-                }
-            )
-        
-        with recording_col2:
-            if webrtc_ctx.state.playing:
-                st.markdown(
-                    '<div style="text-align: center; color: #DAA520;">'
-                    '<div class="status-indicator status-active"></div>'
-                    'Recording in progress...</div>',
-                    unsafe_allow_html=True
-                )
-                st.session_state.audio_processor.recording = True
-            else:
-                st.session_state.audio_processor.recording = False
+        # Audio recording interface
+        webrtc_ctx = webrtc_streamer(
+            key="voice-recorder",
+            media_stream_constraints={
+                "audio": True,
+                "video": False
+            },
+            audio_processor_factory=create_audio_processor,
+            rtc_configuration={
+                "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
+            },
+            translations={
+                "start": "🎙️ Start Recording",
+                "stop": "⏹️ Stop Recording"
+            }
+        )
 
-        if len(st.session_state.audio_processor.audio_chunks) > 0:
-            if st.button("💫 Process Recording", key="process_recording"):
-                with st.spinner("Processing your request..."):
-                    audio_data = np.concatenate(st.session_state.audio_processor.audio_chunks)
+        # Recording status indicator
+        if webrtc_ctx.state.playing:
+            st.markdown(
+                '<div style="text-align: center; color: #DAA520;">'
+                '<div class="status-indicator"></div>'
+                'Recording in progress...</div>',
+                unsafe_allow_html=True
+            )
+            if hasattr(webrtc_ctx, 'audio_processor'):
+                webrtc_ctx.audio_processor.recording = True
+
+        # Process recording button
+        if st.button("✨ Process Recording", key="process"):
+            if hasattr(webrtc_ctx, 'audio_processor') and webrtc_ctx.audio_processor.chunks:
+                with st.spinner("Processing audio..."):
+                    audio_data = np.concatenate(webrtc_ctx.audio_processor.chunks)
                     st.audio(audio_data, format="audio/wav")
-                    st.session_state.audio_processor.audio_chunks = []
-                    
-                    # Add processing status message
-                    st.success("✨ Audio processed successfully!")
+                    webrtc_ctx.audio_processor.chunks = []
+                st.success("Audio processed successfully!")
         
         st.markdown('</div>', unsafe_allow_html=True)
 
+    # Chat history column
     with col2:
         st.markdown('<div class="luxury-container">', unsafe_allow_html=True)
         st.markdown(
@@ -251,21 +176,19 @@ def main():
                 unsafe_allow_html=True
             )
         
-        for message in st.session_state.messages:
-            css_class = "user-message" if message['role'] == 'user' else "assistant-message"
-            icon = "👤" if message['role'] == 'user' else "👑"
-            
+        for msg in st.session_state.messages:
             st.markdown(
-                f'<div class="chat-message {css_class}">{icon} {message["content"]}</div>',
+                f'<div class="chat-message">{msg}</div>',
                 unsafe_allow_html=True
             )
         
         st.markdown('</div>', unsafe_allow_html=True)
 
+    # Footer
     st.markdown(
         '<div style="text-align: center; padding: 2rem; color: #B8860B; '
         'font-family: \'Cormorant Garamond\', serif;">'
-        'LeChateau - Where Luxury Meets Innovation<br>'
+        'LeChateau - Where Elegance Meets Innovation<br>'
         '<span style="font-size: 0.8rem;">Powered by Advanced AI Technology</span>'
         '</div>',
         unsafe_allow_html=True
