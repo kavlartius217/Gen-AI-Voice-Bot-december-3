@@ -7,6 +7,7 @@ pydub
 langchain-groq
 google-generativeai
 langchain-community
+langchain_google_genai
 langchain
 faiss-cpu
 gTTS
