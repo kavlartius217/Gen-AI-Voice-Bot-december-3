@@ -31,16 +31,17 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed"
 )
-
 def load_css():
     st.markdown("""
         <style>
         :root {
-            --bg-dark: #0C0C0C;
-            --primary: #14171A;
+            --bg-dark: #1A1A1A;
+            --primary: #2C2F34;
             --gold: #D4AF37;
             --text: #FFFFFF;
             --error: #FF4444;
+            --shadow: rgba(0, 0, 0, 0.5);
+            --highlight: rgba(212, 175, 55, 0.2);
         }
         
         /* Simple Voice Recorder Button */
@@ -48,8 +49,8 @@ def load_css():
             position: fixed;
             bottom: 3rem;
             right: 2rem;
-            width: 60px;
-            height: 60px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
             background: var(--primary);
             border: 3px solid var(--gold);
@@ -58,8 +59,8 @@ def load_css():
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px var(--shadow);
+            transition: all 0.3s ease-in-out;
             z-index: 1000;
         }
 
@@ -67,6 +68,7 @@ def load_css():
             transform: scale(1.1);
             background: var(--gold);
             color: var(--primary);
+            box-shadow: 0 4px 15px var(--highlight);
         }
 
         .voice-button.recording {
@@ -90,7 +92,7 @@ def load_css():
 
         /* Style for the microphone icon */
         .voice-button i {
-            font-size: 2rem;
+            font-size: 2.5rem;
         }
         
         /* Optional: Styling for a small text hint when idle */
@@ -100,9 +102,10 @@ def load_css():
 
         .voice-button.recording span {
             display: block;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             color: var(--text);
             text-align: center;
+            font-weight: bold;
         }
         
         /* Simple style for the container */
@@ -111,28 +114,36 @@ def load_css():
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(20, 23, 26, 0.95);
-            padding: 1rem 2rem;
+            background: rgba(28, 30, 34, 0.95);
+            padding: 1.5rem 2rem;
             border-top: 1px solid var(--gold);
             z-index: 900;
         }
         
         .stTextInput input {
-            background: rgba(20, 23, 26, 0.8);
+            background: rgba(28, 30, 34, 0.8);
             border: 1px solid var(--gold);
             color: var(--text);
-            border-radius: 25px;
+            border-radius: 30px;
             padding: 1rem 1.5rem;
-            font-size: 1rem;
+            font-size: 1.2rem;
+            font-weight: bold;
         }
         
         .stTextInput input:focus {
             border-color: var(--gold);
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+            box-shadow: 0 0 15px var(--highlight);
+        }
+
+        /* Adding a smooth transition to the input focus */
+        .stTextInput input {
+            transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
         }
         
         </style>
     """, unsafe_allow_html=True)
+
+
 
 
 def init_api_keys():
