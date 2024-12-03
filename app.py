@@ -1,3 +1,5 @@
+```python
+# Section 1: Imports
 import streamlit as st
 import speech_recognition as sr
 from streamlit_webrtc import webrtc_streamer, WebRtcMode
@@ -22,140 +24,14 @@ import os
 import io
 import base64
 
-# Initialize logging
-logging.basicConfig(level=logging.INFO)
+# Section 2: Logging Setup
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
 
-def load_css():
-    st.markdown("""
-        <style>
-        /* Elegant color scheme */
-        :root {
-            --bg-color: #ffffff;
-            --primary: #8B7355;
-            --accent: #C4B6A6;
-            --text: #1A1A1A;
-            --border: #E5E5E5;
-            --highlight: #D4C4B7;
-            --error: #DC3545;
-            --success: #198754;
-        }
-        
-        .stApp {
-            background-color: var(--bg-color);
-        }
-        
-        .header {
-            background: linear-gradient(to right, var(--primary), var(--accent));
-            padding: 2.5rem;
-            border-radius: 0;
-            text-align: center;
-            color: white;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-        }
-        
-        .message {
-            padding: 1.2rem 1.8rem;
-            border-radius: 4px;
-            margin: 0.8rem 0;
-            line-height: 1.6;
-            border: 1px solid var(--border);
-            font-size: 1rem;
-        }
-        
-        .user-message {
-            background: #F8F8F8;
-            color: var(--text);
-            margin-left: 2rem;
-        }
-        
-        .assistant-message {
-            background: white;
-            color: var(--text);
-            margin-right: 2rem;
-            border-left: 3px solid var(--primary);
-        }
-        
-        .voice-controls {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin: 1rem 0;
-        }
-        
-        .stButton > button {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-        }
-        
-        .stButton > button:hover {
-            background: var(--accent);
-            transform: translateY(-1px);
-        }
-        
-        .record-button > button {
-            background: var(--error);
-        }
-        
-        .record-button > button:hover {
-            background: #bb2d3b;
-        }
-        
-        .input-area {
-            background: white;
-            padding: 1.5rem;
-            border-top: 1px solid var(--border);
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-        }
-        
-        .stTextInput > div > div > input {
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            padding: 0.8rem 1.2rem;
-        }
-        
-        .stTextInput > div > div > input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 1px var(--primary);
-        }
-        
-        .streamlit-webrtc-container {
-            display: none;
-        }
-        
-        .stAudio {
-            margin-top: 0.5rem;
-        }
-        
-        .success-text {
-            color: var(--success);
-        }
-        
-        .error-text {
-            color: var(--error);
-        }
-        
-        div[data-testid="stVerticalBlock"] {
-            gap: 0rem;
-        }
-        
-        /* Add padding to main container to prevent content from being hidden behind fixed input area */
-        .main > div {
-            padding-bottom: 100px;
-        }
-        </style>
-    """, unsafe_allow_html=True)
-
-# Initialize Streamlit page config
+# Section 3: Streamlit Configuration
 st.set_page_config(
     page_title="Restaurant Voice Assistant",
     page_icon="🎤",
@@ -163,57 +39,80 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# Section 4: CSS and UI
+[Previous CSS code remains exactly the same]
+
+# Section 5: API Key Management
 def init_api_keys():
-    if 'GROQ_API_KEY' not in st.secrets or 'GOOGLE_API_KEY' not in st.secrets:
-        st.error("Please set GROQ_API_KEY and GOOGLE_API_KEY in Streamlit secrets")
+    if 'GROQ_API_KEY' not in st.secrets:
+        st.error("Missing GROQ_API_KEY in Streamlit secrets")
         st.stop()
+    if 'GOOGLE_API_KEY' not in st.secrets:
+        st.error("Missing GOOGLE_API_KEY in Streamlit secrets")
+        st.stop()
+    
+    logger.info("API keys initialized successfully")
     return st.secrets["GROQ_API_KEY"], st.secrets["GOOGLE_API_KEY"]
 
+# Section 6: LangChain Setup
 @st.cache_resource
 def initialize_agent():
-    groq_key, google_key = init_api_keys()
-    
-    llm = ChatGroq(
-        model_name="gemma2-9b-it",
-        api_key=groq_key
-    )
-    
-    embeddings = GoogleGenerativeAIEmbeddings(
-        model="models/embedding-001",
-        google_api_key=google_key
-    )
-    
-    csv_loader = CSVLoader("table_data (1).csv")
-    documents = csv_loader.load()
-    
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500,
-        chunk_overlap=50
-    )
-    docs = text_splitter.split_documents(documents)
-    
-    db = FAISS.from_documents(docs, embeddings)
-    retriever = db.as_retriever()
-    
-    reservation_tool = create_retriever_tool(
-        retriever,
-        "reservation_data_tool",
-        "has the table data for the purpose of making reservations"
-    )
-    
-    def say_hello(customer_input):
-        if customer_input.lower() in ["hello", "hey", "hi"]:
-            return "Hello! Welcome to LeChateau. How can I help you today?"
-    
-    greeting_tool = Tool.from_function(
-        func=say_hello,
-        name="say_hello_tool",
-        description="use this tool to greet the customer after the customer has greeted you"
-    )
-    
-    tools = [reservation_tool, greeting_tool]
-    
-    prompt = PromptTemplate.from_template("""You are an AI assistant managing reservations at LeChateau restaurant. When the guest greets you, you shall also greet the guest and use say_hello_tool for this task. When a guest requests a reservation, use the reservation_data tool to check available tables for the specified time and number of people. Present all available tables with their specific locations (e.g., "Table 4 by the window", "Table 7 in the garden area"). After displaying options, let the guest choose their preferred table and confirm their booking immediately.
+    try:
+        groq_key, google_key = init_api_keys()
+        
+        # Initialize LLM
+        llm = ChatGroq(
+            model_name="gemma2-9b-it",
+            api_key=groq_key,
+            temperature=0.7
+        )
+        
+        # Initialize embeddings
+        embeddings = GoogleGenerativeAIEmbeddings(
+            model="models/embedding-001",
+            google_api_key=google_key
+        )
+        
+        # Load and process reservation data
+        try:
+            csv_loader = CSVLoader("table_data (1).csv")
+            documents = csv_loader.load()
+            
+            text_splitter = RecursiveCharacterTextSplitter(
+                chunk_size=500,
+                chunk_overlap=50
+            )
+            docs = text_splitter.split_documents(documents)
+            
+            # Create vector store
+            db = FAISS.from_documents(docs, embeddings)
+            retriever = db.as_retriever(
+                search_type="similarity",
+                search_kwargs={"k": 5}
+            )
+            
+            # Create tools
+            reservation_tool = create_retriever_tool(
+                retriever,
+                "reservation_data_tool",
+                "Searches and retrieves restaurant table availability and details"
+            )
+            
+            def say_hello(customer_input: str) -> str:
+                if any(word in customer_input.lower() for word in ["hello", "hey", "hi"]):
+                    return "Hello! Welcome to LeChateau. How can I assist you with your dining plans today?"
+                return None
+            
+            greeting_tool = Tool.from_function(
+                func=say_hello,
+                name="say_hello_tool",
+                description="Greets the customer with a warm welcome message"
+            )
+            
+            tools = [reservation_tool, greeting_tool]
+            
+            # Create prompt template
+            prompt = PromptTemplate.from_template("""You are an AI assistant managing reservations at LeChateau restaurant. When the guest greets you, you shall also greet the guest and use say_hello_tool for this task. When a guest requests a reservation, use the reservation_data tool to check available tables for the specified time and number of people. Present all available tables with their specific locations (e.g., "Table 4 by the window", "Table 7 in the garden area"). After displaying options, let the guest choose their preferred table and confirm their booking immediately.
 
 {tools}
 
@@ -228,27 +127,45 @@ Final Answer: [Response to guest]
 
 Question: {input}
 Thought:{agent_scratchpad}""")
-    
-    agent = create_react_agent(llm, tools, prompt)
-    return AgentExecutor(
-        agent=agent,
-        tools=tools,
-        llm=llm,
-        handle_parsing_errors=True,
-        verbose=True,
-        max_iterations=15
-    )
+            
+            # Create agent
+            agent = create_react_agent(llm, tools, prompt)
+            
+            logger.info("Agent initialized successfully")
+            return AgentExecutor(
+                agent=agent,
+                tools=tools,
+                llm=llm,
+                handle_parsing_errors=True,
+                verbose=True,
+                max_iterations=15
+            )
+            
+        except FileNotFoundError:
+            logger.error("table_data (1).csv file not found")
+            st.error("Restaurant data file not found. Please check the data file.")
+            st.stop()
+            
+    except Exception as e:
+        logger.error(f"Error initializing agent: {str(e)}")
+        st.error("Failed to initialize the restaurant assistant. Please try again.")
+        st.stop()
 
+# Section 7: Audio Processing
 class AudioProcessor:
     def __init__(self):
         self.recognizer = sr.Recognizer()
         self.transcript_queue = queue.Queue()
         self.audio_queue = queue.Queue()
         self.is_processed = threading.Event()
+        self.debug = True
 
     def process_audio(self, frame):
         try:
             audio_data = frame.to_ndarray()
+            if self.debug:
+                logger.info(f"Audio frame received: shape={audio_data.shape}, max={np.max(audio_data)}")
+            
             self.audio_queue.put(audio_data)
             
             if not self.is_processed.is_set():
@@ -262,13 +179,22 @@ class AudioProcessor:
     def process_accumulated_audio(self):
         try:
             audio_data = []
-            while not self.audio_queue.empty():
-                audio_data.append(self.audio_queue.get())
+            frame_count = 0
             
+            while not self.audio_queue.empty():
+                frame = self.audio_queue.get()
+                audio_data.append(frame)
+                frame_count += 1
+
             if not audio_data:
+                if self.debug:
+                    logger.warning("No audio data to process")
                 return
 
             combined_audio = np.concatenate(audio_data)
+            if self.debug:
+                logger.info(f"Combined {frame_count} frames, shape={combined_audio.shape}")
+
             audio_segment = pydub.AudioSegment(
                 combined_audio.tobytes(), 
                 frame_rate=48000,
@@ -276,38 +202,70 @@ class AudioProcessor:
                 channels=1
             )
 
-            audio_wav = audio_segment.export(format="wav").read()
+            audio_wav = io.BytesIO()
+            audio_segment.export(audio_wav, format="wav")
+            audio_wav.seek(0)
             
             with sr.AudioFile(audio_wav) as source:
                 audio = self.recognizer.record(source)
+                if self.debug:
+                    logger.info("Audio captured and ready for transcription")
+                
                 text = self.recognizer.recognize_google(audio)
                 if text:
+                    if self.debug:
+                        logger.info(f"Successfully transcribed: {text}")
                     self.transcript_queue.put(text)
                     self.is_processed.set()
-        
+                    
         except sr.UnknownValueError:
-            logger.info("Speech not recognized")
+            logger.warning("Speech not recognized")
         except Exception as e:
-            logger.error(f"Error processing accumulated audio: {str(e)}")
+            logger.error(f"Error processing audio: {str(e)}")
+
+def verify_audio_input(audio_data) -> bool:
+    """Verify if audio input is being properly processed"""
+    try:
+        if audio_data is None:
+            logger.warning("No audio data received")
+            return False
+        
+        if not isinstance(audio_data, np.ndarray):
+            logger.warning(f"Invalid audio format: {type(audio_data)}")
+            return False
+        
+        if audio_data.size == 0:
+            logger.warning("Empty audio data")
+            return False
+        
+        if np.max(np.abs(audio_data)) < 0.01:
+            logger.warning("Audio signal too weak")
+            return False
+        
+        logger.info("Audio verification passed")
+        return True
+    except Exception as e:
+        logger.error(f"Audio verification failed: {str(e)}")
+        return False
 
 def get_voice_input() -> Union[str, None]:
     try:
         processor = AudioProcessor()
-        recording_placeholder = st.empty()
+        status_placeholder = st.empty()
+        verification_placeholder = st.empty()
         
-        cols = st.columns([3, 1, 1])
+        cols = st.columns([4, 1, 1, 4])
         with cols[1]:
-            start_recording = st.button("▶️ Start Recording", key="start")
-        with cols[2]:
-            stop_recording = st.button("⏹️ Stop Recording", key="stop")
+            if st.button("⏺️", key="start", help="Start Recording"):
+                st.session_state.recording = True
+                status_placeholder.warning("Recording in progress...")
+                logger.info("Recording started")
         
-        if start_recording:
-            st.session_state.recording = True
-            recording_placeholder.warning("🎤 Recording... Click Stop when finished")
-            
-        if stop_recording:
-            st.session_state.recording = False
-            recording_placeholder.info("Processing audio...")
+        with cols[2]:
+            if st.button("⏹️", key="stop", help="Stop Recording"):
+                st.session_state.recording = False
+                status_placeholder.info("Processing audio...")
+                logger.info("Recording stopped")
         
         if st.session_state.get('recording', False):
             ctx = webrtc_streamer(
@@ -322,18 +280,25 @@ def get_voice_input() -> Union[str, None]:
                 desired_playing_state=True
             )
 
-            if ctx.audio_receiver and not processor.transcript_queue.empty():
-                text = processor.transcript_queue.get()
-                recording_placeholder.success(f"Transcribed: {text}")
-                return text
+            if ctx.audio_receiver:
+                logger.info("Audio receiver initialized")
+                if not processor.transcript_queue.empty():
+                    text = processor.transcript_queue.get()
+                    verification_placeholder.success("✓ Audio successfully processed")
+                    status_placeholder.success(f"Transcribed: {text}")
+                    return text
+                else:
+                    verification_placeholder.info("Waiting for speech...")
     
     except Exception as e:
-        st.error(f"Error getting voice input: {str(e)}")
+        logger.error(f"Error in voice input: {str(e)}")
+        st.error("Error processing voice input. Please try again.")
         return None
 
     return None
 
-def text_to_speech(text):
+# Section 8: Text to Speech
+def text_to_speech(text: str) -> Union[bytes, None]:
     try:
         tts = gTTS(text=text, lang='en')
         fp = io.BytesIO()
@@ -343,9 +308,11 @@ def text_to_speech(text):
         logger.error(f"Error in text to speech conversion: {str(e)}")
         return None
 
+# Section 9: Main Application
 def main():
     load_css()
     
+    # Initialize session states
     if 'messages' not in st.session_state:
         st.session_state.messages = []
     if 'chat_history' not in st.session_state:
@@ -353,21 +320,24 @@ def main():
     if 'recording' not in st.session_state:
         st.session_state.recording = False
     
+    # Initialize agent
     agent_executor = initialize_agent()
     
+    # Luxury header
     st.markdown("""
-        <div class="header">
-            <h1>🎤 LeChateau Assistant</h1>
-            <p>Your personal restaurant concierge</p>
+        <div class="luxury-header">
+            <h1>LeChateau Concierge</h1>
+            <p>Exquisite Dining, Personalized Service</p>
         </div>
     """, unsafe_allow_html=True)
     
+    # Chat display
     chat_container = st.container()
     with chat_container:
         for message in st.session_state.messages:
             message_class = "user-message" if message["role"] == "user" else "assistant-message"
             st.markdown(f"""
-                <div class="message {message_class}">
+                <div class="message-container {message_class}">
                     {message["content"]}
                 </div>
             """, unsafe_allow_html=True)
@@ -377,7 +347,8 @@ def main():
                 if audio_bytes:
                     st.audio(audio_bytes, format='audio/mp3')
     
-    st.markdown('<div class="input-area">', unsafe_allow_html=True)
+    # Input area
+    st.markdown('<div class="input-container">', unsafe_allow_html=True)
     cols = st.columns([6, 2, 2])
     
     with cols[0]:
@@ -385,7 +356,7 @@ def main():
             "Message",
             key="user_input",
             label_visibility="collapsed",
-            placeholder="Type your message here..."
+            placeholder="How may I assist you today?"
         )
     
     with cols[1]:
@@ -397,22 +368,27 @@ def main():
     with cols[2]:
         send_button = st.button("Send 📤", key="send", use_container_width=True)
     
+    # Handle input
     if send_button and (user_input or st.session_state.get('user_input')):
         final_input = user_input or st.session_state.get('user_input', '')
         st.session_state.messages.append({"role": "user", "content": final_input})
         
-        with st.spinner("💭 Thinking..."):
-            response = agent_executor.invoke({
-                "input": final_input,
-                "chat_history": st.session_state.chat_history
-            })
-            
-            st.session_state.messages.append({
-                "role": "assistant",
-                "content": response['output']
-            })
-            
-            st.session_state.chat_history.extend([final_input, response['output']])
+        with st.spinner("Processing your request..."):
+            try:
+                response = agent_executor.invoke({
+                    "input": final_input,
+                    "chat_history": st.session_state.chat_history
+                })
+                
+                st.session_state.messages.append({
+                    "role": "assistant",
+                    "content": response['output']
+                })
+                
+                st.session_state.chat_history.extend([final_input, response['output']])
+            except Exception as e:
+                logger.error(f"Error processing request: {str(e)}")
+                st.error("I apologize, but I couldn't process your request. Please try again.")
         
         if 'user_input' in st.session_state:
             del st.session_state.user_input
@@ -420,6 +396,7 @@ def main():
     
     st.markdown('</div>', unsafe_allow_html=True)
     
+    # Clear chat button
     with st.sidebar:
         if st.button("🗑️ Clear Chat", key="clear"):
             st.session_state.messages = []
@@ -430,3 +407,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+```
