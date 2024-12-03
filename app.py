@@ -26,63 +26,127 @@ import base64
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Custom CSS for better UI
+# Custom CSS for enhanced UI
 def load_css():
     st.markdown("""
         <style>
+        /* Main theme colors and fonts */
+        :root {
+            --primary-color: #1f1f1f;
+            --accent-color: #FF4B4B;
+            --bg-color: #ffffff;
+            --text-color: #1f1f1f;
+        }
+        
         .stApp {
-            background-color: #f5f7f9;
+            background: var(--bg-color);
         }
-        .main {
-            background-color: #f5f7f9;
-        }
-        .stButton>button {
-            border-radius: 20px;
-            padding: 10px 24px;
-            background-color: #2e54ff;
+        
+        /* Header styling */
+        .restaurant-header {
+            background: linear-gradient(45deg, #1f1f1f, #2d2d2d);
             color: white;
-            border: none;
-            transition: all 0.3s ease;
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-        .stButton>button:hover {
-            background-color: #1e3cd4;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        
+        .restaurant-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
         }
+        
+        /* Message container styling */
         .chat-message {
             padding: 1.5rem;
             border-radius: 15px;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin: 1rem 0;
+            animation: fadeIn 0.5s ease-in-out;
+            max-width: 80%;
         }
+        
         .user-message {
-            background-color: #e3f2fd;
+            background: #f0f2f6;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
         }
+        
         .assistant-message {
-            background-color: #fff;
+            background: #1f1f1f;
+            color: white;
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
         }
-        .stTextInput>div>div>input {
-            border-radius: 20px;
-            padding: 10px 20px;
-            border: 2px solid #e0e0e0;
+        
+        /* Input area styling */
+        .input-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 1rem;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
         }
+        
+        .stTextInput > div > div > input {
+            border: 2px solid #1f1f1f;
+            border-radius: 25px;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .stTextInput > div > div > input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(255,75,75,0.2);
+        }
+        
+        /* Button styling */
+        .stButton > button {
+            border-radius: 25px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            background: #1f1f1f;
+            color: white;
+        }
+        
+        .stButton > button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .voice-button > button {
+            background: var(--accent-color);
+        }
+        
+        /* Audio player styling */
         .stAudio {
             margin-top: 0.5rem;
         }
-        .title-container {
-            text-align: center;
-            padding: 2rem 0;
-            background: linear-gradient(135deg, #2e54ff 0%, #1e3cd4 100%);
-            color: white;
-            border-radius: 15px;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .clear-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
+        
+        /* Hide WebRTC default elements */
+        .streamlit-webrtc-container {
+            display: none;
         }
+        
+        /* Add padding at bottom for fixed input container */
+        .main {
+            padding-bottom: 100px;
+        }
+        
         </style>
     """, unsafe_allow_html=True)
 
@@ -93,28 +157,31 @@ st.set_page_config(
     layout="wide"
 )
 
-# Rest of the initialization functions remain the same
+# Initialize API keys from Streamlit secrets
 def init_api_keys():
     if 'GROQ_API_KEY' not in st.secrets or 'GOOGLE_API_KEY' not in st.secrets:
         st.error("Please set GROQ_API_KEY and GOOGLE_API_KEY in Streamlit secrets")
         st.stop()
     return st.secrets["GROQ_API_KEY"], st.secrets["GOOGLE_API_KEY"]
 
+# Initialize LLM and tools
 @st.cache_resource
 def initialize_agent():
-    # Your existing initialize_agent code remains unchanged
     groq_key, google_key = init_api_keys()
     
+    # Initialize LLM
     llm = ChatGroq(
         model_name="gemma2-9b-it",
         api_key=groq_key
     )
     
+    # Initialize embeddings
     embeddings = GoogleGenerativeAIEmbeddings(
         model="models/embedding-001",
         google_api_key=google_key
     )
     
+    # Load and process table data
     csv_loader = CSVLoader("table_data (1).csv")
     documents = csv_loader.load()
     
@@ -124,9 +191,11 @@ def initialize_agent():
     )
     docs = text_splitter.split_documents(documents)
     
+    # Create vector store and retriever
     db = FAISS.from_documents(docs, embeddings)
     retriever = db.as_retriever()
     
+    # Create tools
     reservation_tool = create_retriever_tool(
         retriever,
         "reservation_data_tool",
@@ -145,6 +214,7 @@ def initialize_agent():
     
     tools = [reservation_tool, greeting_tool]
     
+    # Create prompt
     prompt = PromptTemplate.from_template("""You are an AI assistant managing reservations at LeChateau restaurant. When the guest greets you, you shall also greet the guest and use say_hello_tool for this task. When a guest requests a reservation, use the reservation_data tool to check available tables for the specified time and number of people. Present all available tables with their specific locations (e.g., "Table 4 by the window", "Table 7 in the garden area"). After displaying options, let the guest choose their preferred table and confirm their booking immediately.
 
 {tools}
@@ -161,6 +231,7 @@ Final Answer: [Response to guest]
 Question: {input}
 Thought:{agent_scratchpad}""")
     
+    # Create agent
     agent = create_react_agent(llm, tools, prompt)
     return AgentExecutor(
         agent=agent,
@@ -171,7 +242,6 @@ Thought:{agent_scratchpad}""")
         max_iterations=15
     )
 
-# AudioProcessor class remains unchanged
 class AudioProcessor:
     def __init__(self):
         self.recognizer = sr.Recognizer()
@@ -223,21 +293,23 @@ class AudioProcessor:
         except Exception as e:
             logger.error(f"Error processing accumulated audio: {str(e)}")
 
-# Voice input function remains unchanged
 def get_voice_input() -> Union[str, None]:
     try:
         processor = AudioProcessor()
         
-        ctx = webrtc_streamer(
-            key="voice-input",
-            mode=WebRtcMode.SENDONLY,
-            audio_receiver_size=1024,
-            rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
-            media_stream_constraints={"video": False, "audio": True},
-            async_processing=True,
-            video_processor_factory=None,
-            audio_processor_factory=lambda: processor
-        )
+        # Hide the WebRTC UI but keep functionality
+        with st.container():
+            ctx = webrtc_streamer(
+                key="voice-input",
+                mode=WebRtcMode.SENDONLY,
+                audio_receiver_size=1024,
+                rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
+                media_stream_constraints={"video": False, "audio": True},
+                async_processing=True,
+                video_processor_factory=None,
+                audio_processor_factory=lambda: processor,
+                desired_playing_state=True
+            )
 
         if ctx.audio_receiver:
             if not processor.transcript_queue.empty():
@@ -249,7 +321,6 @@ def get_voice_input() -> Union[str, None]:
 
     return None
 
-# Text to speech function remains unchanged
 def text_to_speech(text):
     try:
         tts = gTTS(text=text, lang='en')
@@ -264,95 +335,87 @@ def main():
     # Load custom CSS
     load_css()
     
-    # Initialize session state
+    # Initialize session states
     if 'messages' not in st.session_state:
         st.session_state.messages = []
     if 'chat_history' not in st.session_state:
         st.session_state.chat_history = []
+    if 'recording' not in st.session_state:
+        st.session_state.recording = False
     
     # Initialize agent
     agent_executor = initialize_agent()
     
-    # Create a container for the title with gradient background
-    with st.container():
-        st.markdown("""
-            <div class="title-container">
-                <h1>🎤 Restaurant Voice Assistant</h1>
-                <p>Welcome to LeChateau's Intelligent Reservation System</p>
-            </div>
-        """, unsafe_allow_html=True)
+    # Elegant header
+    st.markdown("""
+        <div class="restaurant-header">
+            <h1>🎤 LeChateau Voice Assistant</h1>
+            <p>Your personal restaurant booking companion</p>
+        </div>
+    """, unsafe_allow_html=True)
     
-    # Create a container for chat messages
+    # Chat messages container
     chat_container = st.container()
-    
-    # Display chat messages with enhanced styling
     with chat_container:
         for message in st.session_state.messages:
             message_class = "user-message" if message["role"] == "user" else "assistant-message"
-            with st.container():
-                st.markdown(f"""
-                    <div class="chat-message {message_class}">
-                        <p>{message["content"]}</p>
-                    </div>
-                """, unsafe_allow_html=True)
-                
-                if message["role"] == "assistant":
-                    audio_bytes = text_to_speech(message["content"])
-                    if audio_bytes:
-                        st.audio(audio_bytes, format='audio/mp3')
+            st.markdown(f"""
+                <div class="chat-message {message_class}">
+                    {message["content"]}
+                </div>
+            """, unsafe_allow_html=True)
+            
+            if message["role"] == "assistant":
+                audio_bytes = text_to_speech(message["content"])
+                if audio_bytes:
+                    st.audio(audio_bytes, format='audio/mp3')
     
-    # Chat input form with modern styling
-    with st.form(key="chat_form", clear_on_submit=True):
-        st.markdown("<br>", unsafe_allow_html=True)  # Add some spacing
+    # Input form with fixed position
+    with st.container():
+        st.markdown('<div class="input-container">', unsafe_allow_html=True)
         cols = st.columns([3, 1, 1])
         
         with cols[0]:
-            user_input = st.text_input("Message", key="user_input", label_visibility="collapsed", 
+            user_input = st.text_input("Message", 
+                                     key="user_input", 
+                                     label_visibility="collapsed",
                                      placeholder="Type your message here...")
+        
         with cols[1]:
-            voice_button = st.form_submit_button("🎤 Voice", use_container_width=True)
+            if st.button("🎙️ Record", key="voice", use_container_width=True):
+                with st.spinner("Listening..."):
+                    voice_text = get_voice_input()
+                    if voice_text:
+                        st.session_state.user_input = voice_text
+                        st.rerun()
+        
         with cols[2]:
-            submit_button = st.form_submit_button("Send 📤", use_container_width=True)
-
-        if voice_button:
-            with st.spinner("🎤 Listening..."):
-                voice_text = get_voice_input()
-                if voice_text:
-                    st.session_state.user_input = voice_text
-                    st.rerun()
-
-        if submit_button and (user_input or st.session_state.get('user_input')):
-            final_input = user_input or st.session_state.get('user_input', '')
-            
-            st.session_state.messages.append({"role": "user", "content": final_input})
-            
-            with st.spinner("💭 Processing..."):
-                response = agent_executor.invoke({
-                    "input": final_input,
-                    "chat_history": st.session_state.chat_history
-                })
+            if st.button("Send 📤", key="send", use_container_width=True) and (user_input or st.session_state.get('user_input')):
+                final_input = user_input or st.session_state.get('user_input', '')
+                st.session_state.messages.append({"role": "user", "content": final_input})
                 
-                st.session_state.messages.append({
-                    "role": "assistant",
-                    "content": response['output']
-                })
+                with st.spinner("Processing..."):
+                    response = agent_executor.invoke({
+                        "input": final_input,
+                        "chat_history": st.session_state.chat_history
+                    })
+                    
+                    st.session_state.messages.append({
+                        "role": "assistant",
+                        "content": response['output']
+                    })
+                    
+                    st.session_state.chat_history.extend([final_input, response['output']])
                 
-                st.session_state.chat_history.extend([
-                    final_input,
-                    response['output']
-                ])
-            
-            if 'user_input' in st.session_state:
-                del st.session_state.user_input
-            
-            st.rerun()
-
-    # Clear chat button with modern styling
+                if 'user_input' in st.session_state:
+                    del st.session_state.user_input
+                st.rerun()
+        
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Clear chat button in sidebar
     with st.sidebar:
-        st.markdown("""
-            <div class="clear-button">
-        """, unsafe_allow_html=True)
-        if st.button("🗑️ Clear Chat", key="clear_chat"):
+        if st.button("🗑️ Clear Chat", key="clear"):
             st.session_state.messages = []
             st.session_state.chat_history = []
             if 'user_input' in st.session_state:
