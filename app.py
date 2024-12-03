@@ -1,5 +1,5 @@
 import streamlit as st
-from streamlit_webrtc import webrtc_streamer, WebRtcMode
+from streamlit_webrtc import webrtc_streamer
 import numpy as np
 import av
 from typing import List
@@ -13,12 +13,10 @@ from langchain.tools import Tool
 # Custom CSS for luxury styling
 LUXURY_STYLE = """
 <style>
-    /* Main container styling */
     .main {
         background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
     }
     
-    /* Custom container for luxury content */
     .luxury-container {
         background: linear-gradient(145deg, rgba(26, 26, 26, 0.9) 0%, rgba(45, 45, 45, 0.9) 100%);
         border: 1px solid #B8860B;
@@ -28,7 +26,6 @@ LUXURY_STYLE = """
         box-shadow: 0 4px 15px rgba(184, 134, 11, 0.1);
     }
     
-    /* Header styling */
     .luxury-header {
         background: linear-gradient(to right, #B8860B, #FFD700);
         -webkit-background-clip: text;
@@ -50,7 +47,6 @@ LUXURY_STYLE = """
         margin-bottom: 2rem;
     }
     
-    /* Recording button styling */
     .stButton button {
         background: linear-gradient(145deg, #1a1a1a, #2d2d2d);
         color: #DAA520;
@@ -70,7 +66,6 @@ LUXURY_STYLE = """
         box-shadow: 0 6px 20px rgba(184, 134, 11, 0.3);
     }
     
-    /* Chat message styling */
     .chat-message {
         padding: 1rem;
         margin: 0.5rem 0;
@@ -88,7 +83,6 @@ LUXURY_STYLE = """
         border-right: 3px solid #DAA520;
     }
     
-    /* Audio player styling */
     .stAudio {
         background: linear-gradient(145deg, #1a1a1a, #2d2d2d);
         border-radius: 10px;
@@ -97,7 +91,6 @@ LUXURY_STYLE = """
         border: 1px solid #B8860B;
     }
     
-    /* Status indicator */
     .status-indicator {
         width: 10px;
         height: 10px;
@@ -113,40 +106,44 @@ LUXURY_STYLE = """
     }
     
     @keyframes pulse {
-        0% {
-            transform: scale(1);
-            opacity: 1;
-        }
-        50% {
-            transform: scale(1.2);
-            opacity: 0.7;
-        }
-        100% {
-            transform: scale(1);
-            opacity: 1;
-        }
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.2); opacity: 0.7; }
+        100% { transform: scale(1); opacity: 1; }
     }
     
-    /* Custom scrollbar */
-    ::-webkit-scrollbar {
-        width: 8px;
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #1a1a1a; }
+    ::-webkit-scrollbar-thumb { 
+        background: #B8860B; 
+        border-radius: 4px; 
+    }
+    ::-webkit-scrollbar-thumb:hover { background: #DAA520; }
+
+    /* WebRTC elements styling */
+    .streamlit-webrtc-container {
+        background: transparent !important;
     }
     
-    ::-webkit-scrollbar-track {
-        background: #1a1a1a;
+    video {
+        display: none !important;
     }
     
-    ::-webkit-scrollbar-thumb {
-        background: #B8860B;
-        border-radius: 4px;
+    .streamlit-webrtc-container button {
+        background: linear-gradient(145deg, #1a1a1a, #2d2d2d) !important;
+        color: #DAA520 !important;
+        border: 2px solid #B8860B !important;
+        border-radius: 50px !important;
+        padding: 0.5rem 1.5rem !important;
+        font-family: 'Cormorant Garamond', serif !important;
+        transition: all 0.3s ease !important;
     }
     
-    ::-webkit-scrollbar-thumb:hover {
-        background: #DAA520;
+    .streamlit-webrtc-container button:hover {
+        background: linear-gradient(145deg, #B8860B, #DAA520) !important;
+        color: #1a1a1a !important;
     }
 </style>
 
-<!-- Import Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 """
 
@@ -180,37 +177,39 @@ def main():
         initial_sidebar_state="collapsed"
     )
     
-    # Inject custom CSS
     st.markdown(LUXURY_STYLE, unsafe_allow_html=True)
     
-    # Header
     st.markdown('<div class="luxury-header">LeChateau Concierge</div>', unsafe_allow_html=True)
     st.markdown('<div class="luxury-subheader">Your Personal Reservation Assistant</div>', unsafe_allow_html=True)
 
-    # Initialize session state
     if 'audio_processor' not in st.session_state:
         st.session_state.audio_processor = AudioProcessor()
     if 'messages' not in st.session_state:
         st.session_state.messages = []
 
-    # Create main columns
     col1, col2 = st.columns([2, 1])
 
     with col1:
         st.markdown('<div class="luxury-container">', unsafe_allow_html=True)
         
-        # Minimal recording interface
         recording_col1, recording_col2 = st.columns([3, 1])
         
         with recording_col1:
             webrtc_ctx = webrtc_streamer(
                 key="voice-recorder",
-                mode=WebRtcMode.AUDIO_ONLY,
+                media_stream_constraints={
+                    "audio": True,
+                    "video": False
+                },
                 audio_processor_factory=lambda: st.session_state.audio_processor,
                 rtc_configuration={
                     "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
                 },
-                media_stream_constraints={"audio": True},
+                translations={
+                    "start": "🎙️ Start Recording",
+                    "stop": "⏹️ Stop Recording",
+                    "select_device": "Select Audio Device"
+                }
             )
         
         with recording_col2:
@@ -218,7 +217,7 @@ def main():
                 st.markdown(
                     '<div style="text-align: center; color: #DAA520;">'
                     '<div class="status-indicator status-active"></div>'
-                    'Recording...</div>',
+                    'Recording in progress...</div>',
                     unsafe_allow_html=True
                 )
                 st.session_state.audio_processor.recording = True
@@ -226,16 +225,31 @@ def main():
                 st.session_state.audio_processor.recording = False
 
         if len(st.session_state.audio_processor.audio_chunks) > 0:
-            if st.button("Process Recording", key="process_recording"):
-                audio_data = np.concatenate(st.session_state.audio_processor.audio_chunks)
-                st.audio(audio_data, format="audio/wav")
-                st.session_state.audio_processor.audio_chunks = []
+            if st.button("💫 Process Recording", key="process_recording"):
+                with st.spinner("Processing your request..."):
+                    audio_data = np.concatenate(st.session_state.audio_processor.audio_chunks)
+                    st.audio(audio_data, format="audio/wav")
+                    st.session_state.audio_processor.audio_chunks = []
+                    
+                    # Add processing status message
+                    st.success("✨ Audio processed successfully!")
         
         st.markdown('</div>', unsafe_allow_html=True)
 
     with col2:
         st.markdown('<div class="luxury-container">', unsafe_allow_html=True)
-        st.markdown('<h3 style="color: #DAA520; font-family: \'Cinzel\', serif; text-align: center;">Conversation History</h3>', unsafe_allow_html=True)
+        st.markdown(
+            '<h3 style="color: #DAA520; font-family: \'Cinzel\', serif; text-align: center;">'
+            '💬 Conversation History</h3>', 
+            unsafe_allow_html=True
+        )
+        
+        if not st.session_state.messages:
+            st.markdown(
+                '<div style="text-align: center; color: #B8860B; font-style: italic;">'
+                'Your conversation will appear here...</div>',
+                unsafe_allow_html=True
+            )
         
         for message in st.session_state.messages:
             css_class = "user-message" if message['role'] == 'user' else "assistant-message"
@@ -248,11 +262,11 @@ def main():
         
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # Footer
     st.markdown(
-        '<div style="text-align: center; padding: 2rem; color: #B8860B; font-family: \'Cormorant Garamond\', serif;">'
-        'LeChateau - Where Luxury Meets Innovation'
-        '<br><span style="font-size: 0.8rem;">Powered by Advanced AI Technology</span>'
+        '<div style="text-align: center; padding: 2rem; color: #B8860B; '
+        'font-family: \'Cormorant Garamond\', serif;">'
+        'LeChateau - Where Luxury Meets Innovation<br>'
+        '<span style="font-size: 0.8rem;">Powered by Advanced AI Technology</span>'
         '</div>',
         unsafe_allow_html=True
     )
