@@ -68,7 +68,7 @@ def setup_agent():
         )
 
         # Load CSV data
-        csv = CSVLoader("table_data.csv")
+        csv = CSVLoader("table_data(1).csv")
         csv_data = csv.load()
 
         # Split documents
