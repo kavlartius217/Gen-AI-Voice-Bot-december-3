@@ -39,104 +39,80 @@ def load_css():
             --bg-dark: #0C0C0C;
             --primary: #14171A;
             --gold: #D4AF37;
-            --light-gold: #F4E6BA;
             --text: #FFFFFF;
-            --text-dark: #A0A0A0;
             --error: #FF4444;
-            --success: #50C878;
         }
         
-        .stApp {
-            background: linear-gradient(135deg, var(--bg-dark), var(--primary));
-            color: var(--text);
-        }
-        
-        .modern-header {
-            background: linear-gradient(90deg, var(--bg-dark), var(--primary));
-            padding: 2rem;
-            margin: -6rem -4rem 2rem -4rem;
-            border-bottom: 2px solid var(--gold);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-        }
-        
-        .modern-header h1 {
-            font-family: 'Cinzel', serif;
-            font-size: 3.5rem;
-            background: linear-gradient(45deg, var(--gold), var(--light-gold));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-align: center;
-            margin-bottom: 0.5rem;
-        }
-        
-        .modern-header p {
-            color: var(--text-dark);
-            text-align: center;
-            font-size: 1.2rem;
-            font-weight: 300;
-            letter-spacing: 2px;
-        }
-        
-        .message {
-            padding: 1.2rem 1.8rem;
-            margin: 1rem auto;
-            border-radius: 12px;
-            max-width: 85%;
-            backdrop-filter: blur(10px);
-            animation: slideIn 0.3s ease;
-        }
-        
-        .user-message {
-            background: rgba(20, 23, 26, 0.8);
-            border-left: 3px solid var(--gold);
-            margin-left: 15%;
-            color: var(--text);
-        }
-        
-        .assistant-message {
-            background: rgba(12, 12, 12, 0.8);
-            border-right: 3px solid var(--light-gold);
-            margin-right: 15%;
-            color: var(--text);
-        }
-        
+        /* Simple Voice Recorder Button */
         .voice-button {
             position: fixed;
+            bottom: 3rem;
             right: 2rem;
-            bottom: 7rem;
             width: 60px;
             height: 60px;
             border-radius: 50%;
             background: var(--primary);
-            border: 2px solid var(--gold);
+            border: 3px solid var(--gold);
             color: var(--gold);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
             transition: all 0.3s ease;
             z-index: 1000;
-            font-size: 1.5rem;
         }
-        
+
         .voice-button:hover {
             transform: scale(1.1);
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+            background: var(--gold);
+            color: var(--primary);
         }
-        
+
         .voice-button.recording {
-            animation: pulse 1.5s infinite;
             background: var(--error);
+            border-color: var(--error);
+            animation: pulse 1s infinite;
+        }
+
+        /* Pulse animation for the recording state */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Style for the microphone icon */
+        .voice-button i {
+            font-size: 2rem;
         }
         
+        /* Optional: Styling for a small text hint when idle */
+        .voice-button span {
+            display: none;
+        }
+
+        .voice-button.recording span {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text);
+            text-align: center;
+        }
+        
+        /* Simple style for the container */
         .input-area {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(12, 12, 12, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 1.5rem 2rem;
+            background: rgba(20, 23, 26, 0.95);
+            padding: 1rem 2rem;
             border-top: 1px solid var(--gold);
             z-index: 900;
         }
@@ -148,67 +124,16 @@ def load_css():
             border-radius: 25px;
             padding: 1rem 1.5rem;
             font-size: 1rem;
-            transition: all 0.3s ease;
         }
         
         .stTextInput input:focus {
-            border-color: var(--light-gold);
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+            border-color: var(--gold);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
         }
         
-        .status-indicator {
-            position: fixed;
-            top: 1rem;
-            right: 1rem;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            background: rgba(12, 12, 12, 0.9);
-            color: var(--gold);
-            font-size: 0.9rem;
-            z-index: 1000;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.4); }
-            70% { box-shadow: 0 0 0 20px rgba(255, 68, 68, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0); }
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .streamlit-webrtc-container {
-            display: none;
-        }
-        
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: var(--bg-dark);
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: var(--gold);
-            border-radius: 3px;
-        }
-        
-        .main > div {
-            padding-bottom: 100px;
-        }
         </style>
-        
-        <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
     """, unsafe_allow_html=True)
+
 
 def init_api_keys():
     if 'GROQ_API_KEY' not in st.secrets or 'GOOGLE_API_KEY' not in st.secrets:
