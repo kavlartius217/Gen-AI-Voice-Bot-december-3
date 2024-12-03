@@ -1,4 +1,4 @@
-```python
+
 import streamlit as st
 import speech_recognition as sr
 from streamlit_webrtc import webrtc_streamer, WebRtcMode
@@ -354,4 +354,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-```
