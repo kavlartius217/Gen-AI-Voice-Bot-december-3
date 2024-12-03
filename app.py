@@ -35,46 +35,55 @@ def load_css():
     st.markdown("""
         <style>
         :root {
-            --bg-dark: #1A1A1A;
+            --bg-dark: #181818;
             --primary: #2C2F34;
             --gold: #D4AF37;
+            --gold-light: #F4E1A1;
             --text: #FFFFFF;
             --error: #FF4444;
-            --shadow: rgba(0, 0, 0, 0.5);
-            --highlight: rgba(212, 175, 55, 0.2);
+            --shadow: rgba(0, 0, 0, 0.6);
+            --highlight: rgba(212, 175, 55, 0.3);
+            --soft-shadow: rgba(0, 0, 0, 0.2);
         }
-        
+
+        /* Global Body Style */
+        body {
+            background: linear-gradient(135deg, #1E1E1E, #121212);
+            font-family: 'Arial', sans-serif;
+            color: var(--text);
+        }
+
         /* Simple Voice Recorder Button */
         .voice-button {
             position: fixed;
             bottom: 3rem;
             right: 2rem;
-            width: 70px;
-            height: 70px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             background: var(--primary);
-            border: 3px solid var(--gold);
+            border: 4px solid var(--gold);
             color: var(--gold);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 4px 12px var(--shadow);
+            box-shadow: 0 4px 16px var(--shadow);
             transition: all 0.3s ease-in-out;
             z-index: 1000;
         }
 
         .voice-button:hover {
-            transform: scale(1.1);
+            transform: scale(1.15);
             background: var(--gold);
             color: var(--primary);
-            box-shadow: 0 4px 15px var(--highlight);
+            box-shadow: 0 6px 18px var(--highlight);
         }
 
         .voice-button.recording {
             background: var(--error);
             border-color: var(--error);
-            animation: pulse 1s infinite;
+            animation: pulse 1.2s infinite;
         }
 
         /* Pulse animation for the recording state */
@@ -83,65 +92,75 @@ def load_css():
                 transform: scale(1);
             }
             50% {
-                transform: scale(1.2);
+                transform: scale(1.25);
             }
             100% {
                 transform: scale(1);
             }
         }
 
-        /* Style for the microphone icon */
+        /* Microphone Icon Style */
         .voice-button i {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
         }
-        
-        /* Optional: Styling for a small text hint when idle */
+
+        /* Recording Text Style */
         .voice-button span {
             display: none;
+            font-size: 0.9rem;
+            color: var(--text);
+            font-weight: bold;
+            text-align: center;
         }
 
         .voice-button.recording span {
             display: block;
-            font-size: 0.9rem;
-            color: var(--text);
-            text-align: center;
-            font-weight: bold;
+            margin-top: 5px;
         }
-        
-        /* Simple style for the container */
+
+        /* Input Area Styling */
         .input-area {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(28, 30, 34, 0.95);
+            background: rgba(24, 24, 24, 0.95);
             padding: 1.5rem 2rem;
-            border-top: 1px solid var(--gold);
+            border-top: 2px solid var(--gold);
+            box-shadow: 0 4px 8px var(--shadow);
             z-index: 900;
         }
-        
+
         .stTextInput input {
-            background: rgba(28, 30, 34, 0.8);
-            border: 1px solid var(--gold);
+            background: rgba(28, 30, 34, 0.85);
+            border: 2px solid var(--gold);
             color: var(--text);
             border-radius: 30px;
-            padding: 1rem 1.5rem;
-            font-size: 1.2rem;
-            font-weight: bold;
+            padding: 1.2rem 1.8rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
-        
+
         .stTextInput input:focus {
             border-color: var(--gold);
             box-shadow: 0 0 15px var(--highlight);
+            outline: none;
         }
 
-        /* Adding a smooth transition to the input focus */
+        .stTextInput input::placeholder {
+            color: var(--gold-light);
+            font-style: italic;
+        }
+
+        /* Smooth Transition for Inputs */
         .stTextInput input {
             transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
         }
-        
+
         </style>
     """, unsafe_allow_html=True)
+
 
 
 
