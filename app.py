@@ -29,114 +29,128 @@ logger = logging.getLogger(__name__)
 def load_css():
     st.markdown("""
         <style>
-        /* Modern, clean color scheme */
+        /* Elegant color scheme */
         :root {
-            --bg-color: #f8f9fa;
-            --primary: #2C3E50;
-            --accent: #3498DB;
-            --text: #2C3E50;
-            --light-gray: #E9ECEF;
-            --user-msg-bg: #E3F2FD;
-            --assistant-msg-bg: #FFFFFF;
+            --bg-color: #ffffff;
+            --primary: #8B7355;
+            --accent: #C4B6A6;
+            --text: #1A1A1A;
+            --border: #E5E5E5;
+            --highlight: #D4C4B7;
+            --error: #DC3545;
+            --success: #198754;
         }
         
         .stApp {
             background-color: var(--bg-color);
         }
         
-        /* Header */
         .header {
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            padding: 2.5rem;
+            border-radius: 0;
             text-align: center;
             color: white;
             margin-bottom: 2rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
         }
         
-        .header h1 {
-            font-size: 2.2rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-        
-        /* Messages */
         .message {
-            padding: 1rem 1.5rem;
-            border-radius: 12px;
-            margin: 0.5rem 0;
-            line-height: 1.5;
-            max-width: 85%;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            padding: 1.2rem 1.8rem;
+            border-radius: 4px;
+            margin: 0.8rem 0;
+            line-height: 1.6;
+            border: 1px solid var(--border);
+            font-size: 1rem;
         }
         
         .user-message {
-            background: var(--user-msg-bg);
-            margin-left: auto;
+            background: #F8F8F8;
             color: var(--text);
+            margin-left: 2rem;
         }
         
         .assistant-message {
-            background: var(--assistant-msg-bg);
-            margin-right: auto;
-            color: var(--text);
-            border: 1px solid var(--light-gray);
-        }
-        
-        /* Input area */
-        .input-area {
             background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-            margin-top: 2rem;
+            color: var(--text);
+            margin-right: 2rem;
+            border-left: 3px solid var(--primary);
         }
         
-        /* Buttons */
+        .voice-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
         .stButton > button {
-            border-radius: 8px;
-            padding: 0.5rem 1rem;
             background: var(--primary);
             color: white;
             border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
             transition: all 0.3s ease;
         }
         
         .stButton > button:hover {
             background: var(--accent);
-            transform: translateY(-2px);
+            transform: translateY(-1px);
         }
         
         .record-button > button {
-            background: #E74C3C;
+            background: var(--error);
         }
         
         .record-button > button:hover {
-            background: #C0392B;
+            background: #bb2d3b;
         }
         
-        /* Audio player */
-        .stAudio {
-            margin-top: 0.5rem;
+        .input-area {
+            background: white;
+            padding: 1.5rem;
+            border-top: 1px solid var(--border);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
         }
         
-        /* Hide WebRTC elements */
+        .stTextInput > div > div > input {
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 0.8rem 1.2rem;
+        }
+        
+        .stTextInput > div > div > input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 1px var(--primary);
+        }
+        
         .streamlit-webrtc-container {
             display: none;
         }
         
-        /* Text input */
-        .stTextInput > div > div > input {
-            border: 2px solid var(--light-gray);
-            border-radius: 8px;
-            padding: 0.75rem 1rem;
-            font-size: 1rem;
+        .stAudio {
+            margin-top: 0.5rem;
         }
         
-        .stTextInput > div > div > input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        .success-text {
+            color: var(--success);
+        }
+        
+        .error-text {
+            color: var(--error);
+        }
+        
+        div[data-testid="stVerticalBlock"] {
+            gap: 0rem;
+        }
+        
+        /* Add padding to main container to prevent content from being hidden behind fixed input area */
+        .main > div {
+            padding-bottom: 100px;
         }
         </style>
     """, unsafe_allow_html=True)
@@ -149,14 +163,12 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Initialize API keys
 def init_api_keys():
     if 'GROQ_API_KEY' not in st.secrets or 'GOOGLE_API_KEY' not in st.secrets:
         st.error("Please set GROQ_API_KEY and GOOGLE_API_KEY in Streamlit secrets")
         st.stop()
     return st.secrets["GROQ_API_KEY"], st.secrets["GOOGLE_API_KEY"]
 
-# Initialize LLM and tools
 @st.cache_resource
 def initialize_agent():
     groq_key, google_key = init_api_keys()
@@ -281,8 +293,23 @@ class AudioProcessor:
 def get_voice_input() -> Union[str, None]:
     try:
         processor = AudioProcessor()
+        recording_placeholder = st.empty()
         
-        with st.container():
+        cols = st.columns([3, 1, 1])
+        with cols[1]:
+            start_recording = st.button("▶️ Start Recording", key="start")
+        with cols[2]:
+            stop_recording = st.button("⏹️ Stop Recording", key="stop")
+        
+        if start_recording:
+            st.session_state.recording = True
+            recording_placeholder.warning("🎤 Recording... Click Stop when finished")
+            
+        if stop_recording:
+            st.session_state.recording = False
+            recording_placeholder.info("Processing audio...")
+        
+        if st.session_state.get('recording', False):
             ctx = webrtc_streamer(
                 key="voice-input",
                 mode=WebRtcMode.SENDONLY,
@@ -295,9 +322,10 @@ def get_voice_input() -> Union[str, None]:
                 desired_playing_state=True
             )
 
-        if ctx.audio_receiver:
-            if not processor.transcript_queue.empty():
-                return processor.transcript_queue.get()
+            if ctx.audio_receiver and not processor.transcript_queue.empty():
+                text = processor.transcript_queue.get()
+                recording_placeholder.success(f"Transcribed: {text}")
+                return text
     
     except Exception as e:
         st.error(f"Error getting voice input: {str(e)}")
@@ -322,10 +350,11 @@ def main():
         st.session_state.messages = []
     if 'chat_history' not in st.session_state:
         st.session_state.chat_history = []
+    if 'recording' not in st.session_state:
+        st.session_state.recording = False
     
     agent_executor = initialize_agent()
     
-    # Header
     st.markdown("""
         <div class="header">
             <h1>🎤 LeChateau Assistant</h1>
@@ -333,7 +362,6 @@ def main():
         </div>
     """, unsafe_allow_html=True)
     
-    # Chat container
     chat_container = st.container()
     with chat_container:
         for message in st.session_state.messages:
@@ -349,7 +377,6 @@ def main():
                 if audio_bytes:
                     st.audio(audio_bytes, format='audio/mp3')
     
-    # Input area
     st.markdown('<div class="input-area">', unsafe_allow_html=True)
     cols = st.columns([6, 2, 2])
     
@@ -362,12 +389,10 @@ def main():
         )
     
     with cols[1]:
-        if st.button("🎙️ Record", key="voice", use_container_width=True, help="Click to start recording"):
-            with st.spinner("🎤 Listening..."):
-                voice_text = get_voice_input()
-                if voice_text:
-                    st.session_state.user_input = voice_text
-                    st.rerun()
+        voice_input = get_voice_input()
+        if voice_input:
+            st.session_state.user_input = voice_input
+            st.rerun()
     
     with cols[2]:
         send_button = st.button("Send 📤", key="send", use_container_width=True)
@@ -395,7 +420,6 @@ def main():
     
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # Clear chat button
     with st.sidebar:
         if st.button("🗑️ Clear Chat", key="clear"):
             st.session_state.messages = []
