@@ -26,6 +26,66 @@ import base64
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Custom CSS for better UI
+def load_css():
+    st.markdown("""
+        <style>
+        .stApp {
+            background-color: #f5f7f9;
+        }
+        .main {
+            background-color: #f5f7f9;
+        }
+        .stButton>button {
+            border-radius: 20px;
+            padding: 10px 24px;
+            background-color: #2e54ff;
+            color: white;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        .stButton>button:hover {
+            background-color: #1e3cd4;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .chat-message {
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        .user-message {
+            background-color: #e3f2fd;
+        }
+        .assistant-message {
+            background-color: #fff;
+        }
+        .stTextInput>div>div>input {
+            border-radius: 20px;
+            padding: 10px 20px;
+            border: 2px solid #e0e0e0;
+        }
+        .stAudio {
+            margin-top: 0.5rem;
+        }
+        .title-container {
+            text-align: center;
+            padding: 2rem 0;
+            background: linear-gradient(135deg, #2e54ff 0%, #1e3cd4 100%);
+            color: white;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .clear-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
 # Initialize Streamlit page config
 st.set_page_config(
     page_title="Restaurant Voice Assistant",
@@ -33,31 +93,28 @@ st.set_page_config(
     layout="wide"
 )
 
-# Initialize API keys from Streamlit secrets
+# Rest of the initialization functions remain the same
 def init_api_keys():
     if 'GROQ_API_KEY' not in st.secrets or 'GOOGLE_API_KEY' not in st.secrets:
         st.error("Please set GROQ_API_KEY and GOOGLE_API_KEY in Streamlit secrets")
         st.stop()
     return st.secrets["GROQ_API_KEY"], st.secrets["GOOGLE_API_KEY"]
 
-# Initialize LLM and tools
 @st.cache_resource
 def initialize_agent():
+    # Your existing initialize_agent code remains unchanged
     groq_key, google_key = init_api_keys()
     
-    # Initialize LLM
     llm = ChatGroq(
         model_name="gemma2-9b-it",
         api_key=groq_key
     )
     
-    # Initialize embeddings
     embeddings = GoogleGenerativeAIEmbeddings(
         model="models/embedding-001",
         google_api_key=google_key
     )
     
-    # Load and process table data
     csv_loader = CSVLoader("table_data (1).csv")
     documents = csv_loader.load()
     
@@ -67,11 +124,9 @@ def initialize_agent():
     )
     docs = text_splitter.split_documents(documents)
     
-    # Create vector store and retriever
     db = FAISS.from_documents(docs, embeddings)
     retriever = db.as_retriever()
     
-    # Create tools
     reservation_tool = create_retriever_tool(
         retriever,
         "reservation_data_tool",
@@ -90,7 +145,6 @@ def initialize_agent():
     
     tools = [reservation_tool, greeting_tool]
     
-    # Create prompt
     prompt = PromptTemplate.from_template("""You are an AI assistant managing reservations at LeChateau restaurant. When the guest greets you, you shall also greet the guest and use say_hello_tool for this task. When a guest requests a reservation, use the reservation_data tool to check available tables for the specified time and number of people. Present all available tables with their specific locations (e.g., "Table 4 by the window", "Table 7 in the garden area"). After displaying options, let the guest choose their preferred table and confirm their booking immediately.
 
 {tools}
@@ -107,7 +161,6 @@ Final Answer: [Response to guest]
 Question: {input}
 Thought:{agent_scratchpad}""")
     
-    # Create agent
     agent = create_react_agent(llm, tools, prompt)
     return AgentExecutor(
         agent=agent,
@@ -118,6 +171,7 @@ Thought:{agent_scratchpad}""")
         max_iterations=15
     )
 
+# AudioProcessor class remains unchanged
 class AudioProcessor:
     def __init__(self):
         self.recognizer = sr.Recognizer()
@@ -169,6 +223,7 @@ class AudioProcessor:
         except Exception as e:
             logger.error(f"Error processing accumulated audio: {str(e)}")
 
+# Voice input function remains unchanged
 def get_voice_input() -> Union[str, None]:
     try:
         processor = AudioProcessor()
@@ -194,6 +249,7 @@ def get_voice_input() -> Union[str, None]:
 
     return None
 
+# Text to speech function remains unchanged
 def text_to_speech(text):
     try:
         tts = gTTS(text=text, lang='en')
@@ -205,6 +261,9 @@ def text_to_speech(text):
         return None
 
 def main():
+    # Load custom CSS
+    load_css()
+    
     # Initialize session state
     if 'messages' not in st.session_state:
         st.session_state.messages = []
@@ -214,31 +273,49 @@ def main():
     # Initialize agent
     agent_executor = initialize_agent()
     
-    st.title("🎤 Restaurant Voice Assistant")
+    # Create a container for the title with gradient background
+    with st.container():
+        st.markdown("""
+            <div class="title-container">
+                <h1>🎤 Restaurant Voice Assistant</h1>
+                <p>Welcome to LeChateau's Intelligent Reservation System</p>
+            </div>
+        """, unsafe_allow_html=True)
     
-    # Display chat messages
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.write(message["content"])
-            if message["role"] == "assistant":
-                # Convert response to speech and create audio player
-                audio_bytes = text_to_speech(message["content"])
-                if audio_bytes:
-                    st.audio(audio_bytes, format='audio/mp3')
+    # Create a container for chat messages
+    chat_container = st.container()
     
-    # Chat input form
+    # Display chat messages with enhanced styling
+    with chat_container:
+        for message in st.session_state.messages:
+            message_class = "user-message" if message["role"] == "user" else "assistant-message"
+            with st.container():
+                st.markdown(f"""
+                    <div class="chat-message {message_class}">
+                        <p>{message["content"]}</p>
+                    </div>
+                """, unsafe_allow_html=True)
+                
+                if message["role"] == "assistant":
+                    audio_bytes = text_to_speech(message["content"])
+                    if audio_bytes:
+                        st.audio(audio_bytes, format='audio/mp3')
+    
+    # Chat input form with modern styling
     with st.form(key="chat_form", clear_on_submit=True):
+        st.markdown("<br>", unsafe_allow_html=True)  # Add some spacing
         cols = st.columns([3, 1, 1])
         
         with cols[0]:
-            user_input = st.text_input("Message", key="user_input", label_visibility="collapsed")
+            user_input = st.text_input("Message", key="user_input", label_visibility="collapsed", 
+                                     placeholder="Type your message here...")
         with cols[1]:
             voice_button = st.form_submit_button("🎤 Voice", use_container_width=True)
         with cols[2]:
-            submit_button = st.form_submit_button("Send", use_container_width=True)
+            submit_button = st.form_submit_button("Send 📤", use_container_width=True)
 
         if voice_button:
-            with st.spinner("Listening..."):
+            with st.spinner("🎤 Listening..."):
                 voice_text = get_voice_input()
                 if voice_text:
                     st.session_state.user_input = voice_text
@@ -247,23 +324,19 @@ def main():
         if submit_button and (user_input or st.session_state.get('user_input')):
             final_input = user_input or st.session_state.get('user_input', '')
             
-            # Add user message
             st.session_state.messages.append({"role": "user", "content": final_input})
             
-            # Get response from agent
-            with st.spinner("Processing..."):
+            with st.spinner("💭 Processing..."):
                 response = agent_executor.invoke({
                     "input": final_input,
                     "chat_history": st.session_state.chat_history
                 })
                 
-                # Add assistant response
                 st.session_state.messages.append({
                     "role": "assistant",
                     "content": response['output']
                 })
                 
-                # Update chat history
                 st.session_state.chat_history.extend([
                     final_input,
                     response['output']
@@ -274,13 +347,17 @@ def main():
             
             st.rerun()
 
-    # Clear chat button
-    if st.sidebar.button("Clear Chat"):
-        st.session_state.messages = []
-        st.session_state.chat_history = []
-        if 'user_input' in st.session_state:
-            del st.session_state.user_input
-        st.rerun()
+    # Clear chat button with modern styling
+    with st.sidebar:
+        st.markdown("""
+            <div class="clear-button">
+        """, unsafe_allow_html=True)
+        if st.button("🗑️ Clear Chat", key="clear_chat"):
+            st.session_state.messages = []
+            st.session_state.chat_history = []
+            if 'user_input' in st.session_state:
+                del st.session_state.user_input
+            st.rerun()
 
 if __name__ == "__main__":
     main()
