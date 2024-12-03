@@ -58,7 +58,7 @@ def initialize_agent():
     )
     
     # Load and process table data
-    csv_loader = CSVLoader("table_data.csv")
+    csv_loader = CSVLoader("table_data (1).csv")
     documents = csv_loader.load()
     
     text_splitter = RecursiveCharacterTextSplitter(
