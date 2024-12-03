@@ -1,13 +1,38 @@
-streamlit
-SpeechRecognition
-streamlit-webrtc
-numpy
-av
-pydub
-langchain-groq
-google-generativeai
-langchain-community
-langchain_google_genai
-langchain
-faiss-cpu
-gTTS
+# Core dependencies
+streamlit==1.32.0
+audio-recorder-streamlit==0.0.8
+python-dotenv==1.0.1
+
+# Audio processing
+gtts==2.5.1
+pygame==2.5.2
+
+# AI and Language Models
+langchain==0.1.9
+langchain-community==0.0.24
+langchain-core==0.1.27
+langchain-groq==0.0.6
+langchain-google-genai==0.0.11
+google-generativeai==0.3.2
+openai==1.12.0
+
+# Vector Store and Embeddings
+faiss-cpu==1.7.4
+numpy==1.26.4
+pandas==2.2.1
+
+# File handling
+python-magic==0.4.27
+python-magic-bin==0.4.14; platform_system == "Windows"
+
+# Utility packages
+requests==2.31.0
+typing-extensions==4.9.0
+pydantic==2.6.1
+tenacity==8.2.3
+aiohttp==3.9.3
+async-timeout==4.0.3
+
+# Optional but recommended for better performance
+ujson==5.9.0
+watchdog==3.0.0
