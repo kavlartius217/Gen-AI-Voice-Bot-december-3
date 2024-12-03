@@ -1,5 +1,6 @@
 streamlit
 streamlit-webrtc
+langchain_community
 langchain
 langchain-groq
 langchain-google-genai
