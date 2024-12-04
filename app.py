@@ -13,6 +13,13 @@ from gtts import gTTS
 import tempfile
 import os
 
+# Page config
+st.set_page_config(
+    page_title="LeChateau Reservation Bot",
+    page_icon="🍽️",
+    layout="wide"
+)
+
 # Custom CSS
 st.markdown("""
 <style>
@@ -111,13 +118,6 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
-
-# Page config
-st.set_page_config(
-    page_title="LeChateau Reservation Bot",
-    page_icon="🍽️",
-    layout="wide"
-)
 
 # Initialize API keys from Streamlit secrets
 GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
