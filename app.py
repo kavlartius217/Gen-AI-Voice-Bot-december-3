@@ -142,8 +142,6 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
-
-""", unsafe_allow_html=True)
 # Initialize API keys from Streamlit secrets
 GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
