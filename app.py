@@ -257,7 +257,7 @@ def initialize_llm_tools():
     )
     
     def say_hello(customer_input):
-        if any(greeting in customer_input.lower() for greeting in ["hello", "hey", "hi"]):
+        if any(greeting in customer_input.lower() for greeting in ["Hello", "Hey", "Hi"]):
             return "Hello! Welcome to LeChateau. How can I help you today?"
         return None
     
@@ -272,9 +272,9 @@ def initialize_llm_tools():
 def create_agent(llm, tools):
     """Create agent with custom prompt"""
     prompt = ChatPromptTemplate.from_messages([
-        ("system", "You are a restaurant reservation assistant. Be concise and direct."),
+        ("system", "You are a Human like restaurant reservation assistant. Be concise and direct."),
         ("system", "For reservations: Check available tables and locations for the specified time."),
-        ("system", "For greetings: Use the say_hello_tool to respond."),
+        ("system", "For greetings such as Hi, Hey and Hello: Use the say_hello_tool to respond."),
         ("system", "For confirmations: Confirm reservation details briefly and end conversation."),
         ("user", "{input}"),
         MessagesPlaceholder(variable_name="agent_scratchpad")
