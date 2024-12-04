@@ -24,20 +24,20 @@ st.markdown("""
 <style>
     /* Main app background */
     .stApp {
-        background: linear-gradient(135deg, #E8E8E8 0%, #F5F5F5 100%);
+        background: linear-gradient(135deg, #002366 0%, #001233 100%);
     }
     
     /* Headers */
     h1, h2, h3 {
-        color: #333333 !important;
+        color: #FFD700 !important;
         font-family: 'Playfair Display', serif;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         letter-spacing: 1px;
     }
     
     /* Subheader */
     .subheader {
-        color: #666666 !important;
+        color: #DAA520 !important;
         font-family: 'Cormorant Garamond', serif;
         font-style: italic;
         letter-spacing: 0.5px;
@@ -45,128 +45,115 @@ st.markdown("""
     
     /* Text areas */
     .stTextArea {
-        background: #FFFFFF;
-        border: 1px solid #E0E0E0;
+        background: linear-gradient(145deg, #001845 0%, #002366 100%);
+        border: 1px solid #FFD700;
         border-radius: 12px;
-        color: #333333 !important;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        color: #FFD700 !important;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     }
     
     /* Success messages */
     .st-emotion-cache-16idsys {
-        background: #FFFFFF;
-        border: 1px solid #CCCCCC;
-        color: #333333;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        background: linear-gradient(145deg, #001845, #002366);
+        border: 1px solid #DAA520;
+        color: #FFD700;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     }
     
     /* Info messages */
     .st-emotion-cache-16r3i8g {
-        background: #F8F8F8;
-        border: 1px solid #E0E0E0;
-        color: #666666;
+        background: linear-gradient(145deg, #002366, #001845);
+        border: 1px solid #FFD700;
+        color: #DAA520;
     }
     
     /* Buttons */
     .stButton button {
-        background: linear-gradient(145deg, #FFFFFF, #F5F5F5);
-        color: #333333;
-        border: 1px solid #E0E0E0;
+        background: linear-gradient(145deg, #FFD700, #DAA520);
+        color: #001233;
+        border: none;
         padding: 12px 24px;
         border-radius: 8px;
-        font-weight: 500;
+        font-weight: bold;
         transition: all 0.3s ease;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
     
     .stButton button:hover {
-        background: linear-gradient(145deg, #F5F5F5, #FFFFFF);
+        background: linear-gradient(145deg, #DAA520, #FFD700);
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 12px rgba(218,165,32,0.4);
     }
     
     /* Audio player */
     .stAudio {
-        background: #FFFFFF;
-        border: 1px solid #E0E0E0;
+        background: linear-gradient(145deg, #001845, #002366);
+        border: 1px solid #DAA520;
         border-radius: 12px;
         padding: 15px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     }
     
     /* Dividers */
     hr {
         border: 0;
         height: 1px;
-        background: linear-gradient(90deg, transparent, #CCCCCC, transparent);
+        background: linear-gradient(90deg, transparent, #FFD700, transparent);
         margin: 25px 0;
     }
     
     /* Chat container */
     .chat-container {
-        background: #FFFFFF;
+        background: linear-gradient(145deg, #001845, #002366);
         border-radius: 16px;
         padding: 25px;
-        border: 1px solid #E0E0E0;
+        border: 1px solid #DAA520;
         margin: 15px 0;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
     
     /* Spinner */
     .stSpinner {
-        border-color: #666666;
+        border-color: #FFD700;
     }
     
     /* Scrollbar */
     ::-webkit-scrollbar {
         width: 8px;
-        background: #F5F5F5;
+        background: #001233;
     }
     
     ::-webkit-scrollbar-thumb {
-        background: #CCCCCC;
+        background: linear-gradient(145deg, #FFD700, #DAA520);
         border-radius: 4px;
     }
     
     ::-webkit-scrollbar-thumb:hover {
-        background: #999999;
+        background: linear-gradient(145deg, #DAA520, #FFD700);
     }
     
     /* Text inputs */
     .stTextInput input {
-        background: #FFFFFF;
-        border: 1px solid #E0E0E0;
-        color: #333333;
+        background: linear-gradient(145deg, #001845, #002366);
+        border: 1px solid #DAA520;
+        color: #FFD700;
         border-radius: 8px;
         padding: 10px 15px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
     
-    /* Additional enhancements */
-    .stMarkdown {
-        color: #333333;
-    }
-    
-    .stText {
-        color: #666666;
-    }
-    
-    /* Header container */
-    .header-container {
-        background: linear-gradient(145deg, #FFFFFF, #F8F8F8);
-        padding: 30px;
-        border-radius: 20px;
-        margin-bottom: 30px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    }
-    
-    /* Message bubbles */
-    .message-bubble {
-        background: #F8F8F8;
-        padding: 15px 20px;
-        border-radius: 12px;
-        margin: 10px 0;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    /* Company branding */
+    .company-brand {
+        text-align: center;
+        padding: 20px;
+        color: #DAA520;
+        font-family: 'Playfair Display', serif;
+        font-size: 1.2em;
+        letter-spacing: 1px;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background: linear-gradient(90deg, transparent, #001233, transparent);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -325,3 +312,10 @@ with col2:
         st.text_area("You:", chat["user"], height=100, disabled=True)
         st.text_area("Bot:", chat["bot"], height=100, disabled=True)
         st.markdown("---")
+
+# Add company branding at the bottom
+st.markdown("""
+<div class='company-brand'>
+    Created by Intellore Systems Private Limited ✨
+</div>
+""", unsafe_allow_html=True)
