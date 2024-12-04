@@ -247,9 +247,9 @@ col1, col2 = st.columns([2, 1])
 
 with col1:
    # In the audio processing section, modify like this:
-if audio_value:
-    st.success("Audio recorded successfully!")
-    st.audio(audio_value)
+    if audio_value:
+      st.success("Audio recorded successfully!")
+      st.audio(audio_value)
     
     # Process audio with Gemini
     try:
