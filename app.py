@@ -20,101 +20,153 @@ st.set_page_config(
     layout="wide"
 )
 
-# Custom CSS
 st.markdown("""
 <style>
+    /* Main app background */
     .stApp {
-        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        background: linear-gradient(135deg, #E8E8E8 0%, #F5F5F5 100%);
     }
     
+    /* Headers */
     h1, h2, h3 {
-        color: #FFD700 !important;
+        color: #333333 !important;
         font-family: 'Playfair Display', serif;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        letter-spacing: 1px;
     }
     
+    /* Subheader */
     .subheader {
-        color: #DAA520 !important;
+        color: #666666 !important;
         font-family: 'Cormorant Garamond', serif;
         font-style: italic;
+        letter-spacing: 0.5px;
     }
     
+    /* Text areas */
     .stTextArea {
-        background: linear-gradient(145deg, #2d2d2d 0%, #1a1a1a 100%);
-        border: 1px solid #FFD700;
-        border-radius: 10px;
-        color: #FFD700 !important;
+        background: #FFFFFF;
+        border: 1px solid #E0E0E0;
+        border-radius: 12px;
+        color: #333333 !important;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     }
     
+    /* Success messages */
     .st-emotion-cache-16idsys {
-        background: linear-gradient(145deg, #1a1a1a, #2d2d2d);
-        border: 1px solid #DAA520;
-        color: #FFD700;
+        background: #FFFFFF;
+        border: 1px solid #CCCCCC;
+        color: #333333;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     }
     
+    /* Info messages */
     .st-emotion-cache-16r3i8g {
-        background: linear-gradient(145deg, #2d2d2d, #1a1a1a);
-        border: 1px solid #FFD700;
-        color: #DAA520;
+        background: #F8F8F8;
+        border: 1px solid #E0E0E0;
+        color: #666666;
     }
     
+    /* Buttons */
     .stButton button {
-        background: linear-gradient(145deg, #FFD700, #DAA520);
-        color: #1a1a1a;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        font-weight: bold;
+        background: linear-gradient(145deg, #FFFFFF, #F5F5F5);
+        color: #333333;
+        border: 1px solid #E0E0E0;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 500;
         transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
     
     .stButton button:hover {
-        background: linear-gradient(145deg, #DAA520, #FFD700);
+        background: linear-gradient(145deg, #F5F5F5, #FFFFFF);
         transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(218,165,32,0.3);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     
+    /* Audio player */
     .stAudio {
-        background: linear-gradient(145deg, #2d2d2d, #1a1a1a);
-        border: 1px solid #DAA520;
-        border-radius: 10px;
-        padding: 10px;
+        background: #FFFFFF;
+        border: 1px solid #E0E0E0;
+        border-radius: 12px;
+        padding: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     }
     
+    /* Dividers */
     hr {
         border: 0;
         height: 1px;
-        background: linear-gradient(90deg, transparent, #FFD700, transparent);
-        margin: 20px 0;
+        background: linear-gradient(90deg, transparent, #CCCCCC, transparent);
+        margin: 25px 0;
     }
     
+    /* Chat container */
     .chat-container {
-        background: linear-gradient(145deg, #1a1a1a, #2d2d2d);
-        border-radius: 15px;
-        padding: 20px;
-        border: 1px solid #DAA520;
-        margin: 10px 0;
+        background: #FFFFFF;
+        border-radius: 16px;
+        padding: 25px;
+        border: 1px solid #E0E0E0;
+        margin: 15px 0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     }
     
+    /* Spinner */
     .stSpinner {
-        border-color: #FFD700;
+        border-color: #666666;
     }
     
+    /* Scrollbar */
     ::-webkit-scrollbar {
-        width: 10px;
-        background: #1a1a1a;
+        width: 8px;
+        background: #F5F5F5;
     }
     
     ::-webkit-scrollbar-thumb {
-        background: linear-gradient(145deg, #FFD700, #DAA520);
-        border-radius: 5px;
+        background: #CCCCCC;
+        border-radius: 4px;
     }
     
+    ::-webkit-scrollbar-thumb:hover {
+        background: #999999;
+    }
+    
+    /* Text inputs */
     .stTextInput input {
-        background: linear-gradient(145deg, #2d2d2d, #1a1a1a);
-        border: 1px solid #DAA520;
-        color: #FFD700;
-        border-radius: 5px;
+        background: #FFFFFF;
+        border: 1px solid #E0E0E0;
+        color: #333333;
+        border-radius: 8px;
+        padding: 10px 15px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    /* Additional enhancements */
+    .stMarkdown {
+        color: #333333;
+    }
+    
+    .stText {
+        color: #666666;
+    }
+    
+    /* Header container */
+    .header-container {
+        background: linear-gradient(145deg, #FFFFFF, #F8F8F8);
+        padding: 30px;
+        border-radius: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    
+    /* Message bubbles */
+    .message-bubble {
+        background: #F8F8F8;
+        padding: 15px 20px;
+        border-radius: 12px;
+        margin: 10px 0;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
 </style>
 """, unsafe_allow_html=True)
