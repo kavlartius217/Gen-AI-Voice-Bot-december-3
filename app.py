@@ -348,10 +348,4 @@ with col2:
         st.text_area("Bot:", chat["bot"], height=100, disabled=True)
         st.markdown("---")
 
-# Add company branding with gradient effect
-with col3:
-     <div class='company-brand'>
-    ✨ Created by Intellore Systems Private Limited ✨
-</div>
-""", unsafe_allow_html=True)
 
