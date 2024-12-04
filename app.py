@@ -171,6 +171,6 @@ with col1:
 with col2:
     st.markdown("### 💬 Chat History")
     for chat in st.session_state.chat_history:
-        st.text_area("You:", chat["user"], height=50, disabled=True)
-        st.text_area("Bot:", chat["bot"], height=50, disabled=True)
+        st.text_area("You:", chat["user"], height=100, disabled=True)
+        st.text_area("Bot:", chat["bot"], height=100, disabled=True)
         st.markdown("---")
