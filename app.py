@@ -215,13 +215,28 @@ def initialize_llm_tools():
 
 def create_agent(llm, tools):
     prompt = ChatPromptTemplate.from_messages([
-        ("system", "You are a Human like restaurant reservation assistant. Be concise and direct and always follow the prompt."),
-        ("system", "For greetings Hi, Hey and Hello: Use the say_hello_tool to respond."),
-        ("system", "When the user specifies the number of people and the time to make a reservation: Check the reservation_data_tool for the tables availabe during the specified time as well as the locations of these tables and convey this information to the user."),
-        ("system", "After the user has chosen a table from the provided options: Confirm reservation details briefly and end conversation."),
-        ("user", "{input}"),
-        MessagesPlaceholder(variable_name="agent_scratchpad")
-    ])
+    ("system", """You are LeChateau's reservation assistant. Follow these rules exactly:
+
+1. GREETINGS:
+   - When user says 'Hi', 'Hey', or 'Hello': MUST use say_hello_tool ONLY
+   - No other response for greetings is allowed
+
+2. RESERVATION REQUESTS:
+   - When user mentions people count AND time: MUST use reservation_data_tool
+   - MUST show ALL available tables and their specific locations
+   - Format: 'Available tables for [time] and [count] people:
+     - Table [number]: [location]
+     - Table [number]: [location]'
+
+3. TABLE SELECTION:
+   - When user selects a table: MUST confirm reservation details only
+   - Format: 'Confirmed: Table [number] at [location] for [count] people at [time]'
+   - End conversation after confirmation
+
+DO NOT engage in general conversation or deviate from these exact steps."""),
+    ("user", "{input}"),
+    MessagesPlaceholder(variable_name="agent_scratchpad")
+])
     
     agent = create_openai_tools_agent(llm, tools, prompt)
     return AgentExecutor(
