@@ -108,7 +108,7 @@ def create_agent(llm, tools):
         llm=llm,
         handle_parsing_errors=True,
         verbose=True,
-        max_iterations=3  # Reduced for faster response
+        max_iterations=10  # Reduced for faster response
     )
 
 # Main UI
