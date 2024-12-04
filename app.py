@@ -143,11 +143,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Add company branding
-st.markdown("""
-<div class='company-brand'>
-    Created by Intellore Systems Private Limited
-</div>
 """, unsafe_allow_html=True)
 # Initialize API keys from Streamlit secrets
 GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
