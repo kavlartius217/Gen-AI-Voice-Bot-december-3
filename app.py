@@ -22,12 +22,12 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-    /* Main app background with rich gradient */
+    /* Main app background with black gradient */
     .stApp {
         background: linear-gradient(135deg, 
-            #000428 0%, 
-            #004e92 50%,
-            #000428 100%);
+            #000000 0%, 
+            #1a1a1a 50%,
+            #000000 100%);
     }
     
     /* Headers with gradient text */
@@ -55,9 +55,9 @@ st.markdown("""
     /* Text areas with depth gradient */
     .stTextArea {
         background: linear-gradient(145deg, 
-            rgba(0,20,60,0.9) 0%, 
-            rgba(0,40,100,0.9) 50%,
-            rgba(0,20,60,0.9) 100%);
+            rgba(0,0,0,0.9) 0%, 
+            rgba(26,26,26,0.9) 50%,
+            rgba(0,0,0,0.9) 100%);
         border: 1px solid;
         border-image: linear-gradient(45deg, #FFD700, #DAA520) 1;
         border-radius: 12px;
@@ -68,8 +68,8 @@ st.markdown("""
     /* Success messages with gradient border */
     .st-emotion-cache-16idsys {
         background: linear-gradient(145deg,
-            rgba(0,30,80,0.9) 0%,
-            rgba(0,50,120,0.9) 100%);
+            rgba(0,0,0,0.9) 0%,
+            rgba(26,26,26,0.9) 100%);
         border: 2px solid;
         border-image: linear-gradient(45deg, #DAA520, #FFD700) 1;
         color: #FFD700;
@@ -78,8 +78,8 @@ st.markdown("""
     /* Info messages with subtle gradient */
     .st-emotion-cache-16r3i8g {
         background: linear-gradient(145deg,
-            rgba(0,40,100,0.9) 0%,
-            rgba(0,60,140,0.9) 100%);
+            rgba(26,26,26,0.9) 0%,
+            rgba(51,51,51,0.9) 100%);
         border: 2px solid;
         border-image: linear-gradient(45deg, #FFD700, #DAA520) 1;
         color: #DAA520;
@@ -92,7 +92,7 @@ st.markdown("""
             #FDB931 50%, 
             #DAA520 100%);
         background-size: 200% auto;
-        color: #000428;
+        color: #000000;
         border: none;
         padding: 12px 24px;
         border-radius: 8px;
@@ -110,8 +110,8 @@ st.markdown("""
     /* Audio player with gradient border */
     .stAudio {
         background: linear-gradient(145deg,
-            rgba(0,30,80,0.9) 0%,
-            rgba(0,50,120,0.9) 100%);
+            rgba(0,0,0,0.9) 0%,
+            rgba(26,26,26,0.9) 100%);
         border: 2px solid;
         border-image: linear-gradient(45deg, #DAA520, #FFD700) 1;
         border-radius: 12px;
@@ -139,9 +139,9 @@ st.markdown("""
     /* Chat container with depth */
     .chat-container {
         background: linear-gradient(145deg,
-            rgba(0,20,60,0.9) 0%,
-            rgba(0,40,100,0.9) 50%,
-            rgba(0,20,60,0.9) 100%);
+            rgba(0,0,0,0.9) 0%,
+            rgba(26,26,26,0.9) 50%,
+            rgba(0,0,0,0.9) 100%);
         border-radius: 16px;
         padding: 25px;
         border: 2px solid;
@@ -153,7 +153,7 @@ st.markdown("""
     /* Gradient scrollbar */
     ::-webkit-scrollbar {
         width: 8px;
-        background: #000428;
+        background: #000000;
     }
     
     ::-webkit-scrollbar-thumb {
@@ -175,7 +175,7 @@ st.markdown("""
         position: fixed;
         bottom: 0;
         width: 100%;
-        background-color: rgba(0,4,40,0.9);
+        background-color: rgba(0,0,0,0.9);
     }
 
     /* Gradient animation */
@@ -184,7 +184,19 @@ st.markdown("""
         50% {background-position: 100% 50%}
         100% {background-position: 0% 50%}
     }
+
+    /* Additional text styling */
+    .stMarkdown {
+        color: #FFD700;
+    }
 </style>
+""", unsafe_allow_html=True)
+
+# Add company branding with gradient effect
+st.markdown("""
+<div class='company-brand'>
+    ✨ Created by Intellore Systems Private Limited ✨
+</div>
 """, unsafe_allow_html=True)
 
 
@@ -344,8 +356,9 @@ with col2:
         st.markdown("---")
 
 # Add company branding with gradient effect
-st.markdown("""
-<div class='company-brand'>
+with col3:
+     <div class='company-brand'>
     ✨ Created by Intellore Systems Private Limited ✨
 </div>
 """, unsafe_allow_html=True)
+
