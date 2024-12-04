@@ -1,13 +1,4 @@
 import streamlit as st
-from streamlit_webrtc import webrtc_streamer
-import numpy as np
-import av
-from typing import List
-import tempfile
-import os
-from gtts import gTTS
-
-# LangChain imports
 from langchain_groq import ChatGroq
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_community.document_loaders import CSVLoader
@@ -17,186 +8,169 @@ from langchain.tools.retriever import create_retriever_tool
 from langchain.tools import Tool
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.agents import create_openai_tools_agent, AgentExecutor
-import speech_recognition as sr
-import soundfile as sf
+import google.generativeai as genai
+from gtts import gTTS
+import tempfile
+import os
 
-class AudioProcessor:
-    def __init__(self):
-        self.chunks = []
-        self.recording = False
-        self.sample_rate = 16000
+# Page config
+st.set_page_config(
+    page_title="LeChateau Reservation Bot",
+    page_icon="🍽️",
+    layout="wide"
+)
 
-    def process_audio(self, frame):
-        if self.recording:
-            sound = frame.to_ndarray()
-            self.chunks.append(sound)
-        return frame
+# Initialize API keys from Streamlit secrets
+GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
+GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
 
-def create_audio_processor():
-    return AudioProcessor()
+# Configure Google Gemini
+genai.configure(api_key=GOOGLE_API_KEY)
 
-def transcribe_audio(audio_data: np.ndarray) -> str:
-    """Transcribe audio using SpeechRecognition"""
+# Initialize session state
+if 'chat_history' not in st.session_state:
+    st.session_state.chat_history = []
+
+def text_to_speech(text):
+    """Convert text to speech and save as temporary file"""
     try:
-        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp_file:
-            sf.write(tmp_file.name, audio_data, 16000)
-            
-            recognizer = sr.Recognizer()
-            with sr.AudioFile(tmp_file.name) as source:
-                audio = recognizer.record(source)
-                return recognizer.recognize_google(audio)
+        tts = gTTS(text, lang='en')
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as temp_audio:
+            tts.save(temp_audio.name)
+            return temp_audio.name
     except Exception as e:
-        st.error(f"Transcription error: {str(e)}")
-        return ""
-    finally:
-        if 'tmp_file' in locals():
-            os.unlink(tmp_file.name)
-
-def setup_agent():
-    try:
-        # Initialize LLM
-        llm = ChatGroq(
-            model_name="gemma2-9b-it",
-            api_key=st.secrets["GROQ_API_KEY"]
-        )
-
-        # Initialize embeddings
-        embeddings = GoogleGenerativeAIEmbeddings(
-            model="models/embedding-001",
-            google_api_key=st.secrets["GOOGLE_API_KEY"],
-            temperature=0.7
-        )
-
-        # Load CSV data
-        csv = CSVLoader("table_data(1).csv")
-        csv_data = csv.load()
-
-        # Split documents
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
-        docs = text_splitter.split_documents(csv_data)
-
-        # Create vector store
-        db = FAISS.from_documents(docs, embeddings)
-        retriever = db.as_retriever()
-
-        # Create tools
-        tool1 = create_retriever_tool(
-            retriever,
-            "reservation_data_tool",
-            "has the table data for the purpose of making reservations"
-        )
-
-        def say_hello(customer_input):
-            if customer_input == "Hello" or customer_input == "Hey":
-                return "Hello Welcome to LeChateu how can I help you today?"
-            return None
-
-        tool2 = Tool.from_function(
-            func=say_hello,
-            name="say_hello_tool",
-            description="use this tool to greet the customer after the customer has greeted you"
-        )
-
-        tools = [tool1, tool2]
-
-        # Create prompt
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", "if user specifies table number and time:present the user with the available tables and their locations available during the specified time"),
-            ("system", "if user greets:greet the user back using the say_hello_tool"),
-            ("system", "if user makes choice:confirm the reservation and conclude the conversation"),
-            ("user", "{input}"),
-            MessagesPlaceholder(variable_name="agent_scratchpad")
-        ])
-
-        # Create agent
-        agent = create_openai_tools_agent(llm, tools, prompt)
-
-        return AgentExecutor(
-            agent=agent,
-            tools=tools,
-            llm=llm,
-            handle_parsing_errors=True,
-            verbose=True,
-            max_iterations=15
-        )
-    except Exception as e:
-        st.error(f"Agent setup error: {str(e)}")
+        st.error(f"Text-to-speech error: {str(e)}")
         return None
 
-def main():
-    st.set_page_config(
-        page_title="LeChateau Reservation",
-        page_icon="🍽️",
-        layout="wide"
+def initialize_llm_tools():
+    """Initialize LLM and tools"""
+    # Initialize Groq LLM (faster than OpenAI)
+    llm = ChatGroq(
+        model_name="gemma2-9b-it",
+        api_key=GROQ_API_KEY,
+        temperature=0.7
+    )
+    
+    # Initialize embeddings
+    embeddings = GoogleGenerativeAIEmbeddings(
+        model="models/embedding-001",
+        google_api_key=GOOGLE_API_KEY
+    )
+    
+    # Load and process CSV data
+    csv_path = "table_data(1).csv"  # Update with your path
+    csv_loader = CSVLoader(csv_path)
+    csv_data = csv_loader.load()
+    
+    # Split documents
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+    docs = text_splitter.split_documents(csv_data)
+    
+    # Create vector store
+    db = FAISS.from_documents(docs, embeddings)
+    retriever = db.as_retriever()
+    
+    # Create tools
+    reservation_tool = create_retriever_tool(
+        retriever,
+        "reservation_data_tool",
+        "has the table data for the purpose of making reservations"
+    )
+    
+    def say_hello(customer_input):
+        if any(greeting in customer_input.lower() for greeting in ["hello", "hey", "hi"]):
+            return "Hello! Welcome to LeChateau. How can I help you today?"
+        return None
+    
+    greeting_tool = Tool.from_function(
+        func=say_hello,
+        name="say_hello_tool",
+        description="use this tool to greet the customer after the customer has greeted you"
+    )
+    
+    return llm, [reservation_tool, greeting_tool]
+
+def create_agent(llm, tools):
+    """Create agent with custom prompt"""
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", "You are a restaurant reservation assistant. Be concise and direct."),
+        ("system", "For reservations: Check available tables and locations for the specified time."),
+        ("system", "For greetings: Use the say_hello_tool to respond."),
+        ("system", "For confirmations: Confirm reservation details briefly and end conversation."),
+        ("user", "{input}"),
+        MessagesPlaceholder(variable_name="agent_scratchpad")
+    ])
+    
+    agent = create_openai_tools_agent(llm, tools, prompt)
+    return AgentExecutor(
+        agent=agent,
+        tools=tools,
+        llm=llm,
+        handle_parsing_errors=True,
+        verbose=True,
+        max_iterations=3  # Reduced for faster response
     )
 
-    st.title("🎙️ LeChateau Voice Reservation System")
+# Main UI
+st.title("🍽️ LeChateau Reservation Bot")
+st.subheader("Voice-enabled Reservation System")
 
-    # Initialize session state
-    if 'agent' not in st.session_state:
-        st.session_state.agent = setup_agent()
-    if 'chat_history' not in st.session_state:
-        st.session_state.chat_history = []
+# Initialize LLM and agent
+llm, tools = initialize_llm_tools()
+agent_executor = create_agent(llm, tools)
 
-    col1, col2 = st.columns([2, 1])
+# Create columns
+col1, col2 = st.columns([2, 1])
 
-    with col1:
-        st.subheader("Voice Interface")
+with col1:
+    # Audio recording
+    audio_value = st.audio_input("Speak your request")
+    
+    if audio_value:
+        st.success("Audio recorded successfully!")
+        st.audio(audio_value)
         
-        # Audio recording interface
-        webrtc_ctx = webrtc_streamer(
-            key="voice-recorder",
-            media_stream_constraints={
-                "audio": True,
-                "video": False
-            },
-            audio_processor_factory=create_audio_processor,
-            rtc_configuration={
-                "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
-            }
-        )
-
-        if webrtc_ctx.state.playing:
-            st.info("🎙️ Recording in progress...")
-            if hasattr(webrtc_ctx, 'audio_processor'):
-                webrtc_ctx.audio_processor.recording = True
-
-        if st.button("Process Recording"):
-            if hasattr(webrtc_ctx, 'audio_processor') and webrtc_ctx.audio_processor.chunks:
-                with st.spinner("Processing your request..."):
-                    # Process audio
-                    audio_data = np.concatenate(webrtc_ctx.audio_processor.chunks)
-                    transcript = transcribe_audio(audio_data)
+        # Process audio with Gemini
+        try:
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp_file:
+                tmp_file.write(audio_value.getvalue())
+                
+                # Use Gemini for transcription
+                audio_file = genai.upload_file(tmp_file.name)
+                model = genai.GenerativeModel("gemini-1.5-flash")
+                result = model.generate_content([audio_file, "transcribe the audio as it is"])
+                customer_input = result.text
+                
+                st.info(f"You said: {customer_input}")
+                
+                # Generate response
+                with st.spinner("Processing..."):
+                    response = agent_executor.invoke({
+                        "input": customer_input,
+                        "chat_history": st.session_state.chat_history
+                    })
                     
-                    if transcript:
-                        st.info(f"You said: {transcript}")
-                        
-                        # Get AI response
-                        response = st.session_state.agent.invoke({
-                            "input": transcript,
-                            "chat_history": st.session_state.chat_history
-                        })
-                        
-                        # Update chat history
-                        st.session_state.chat_history.extend([
-                            response['input'],
-                            response['output']
-                        ])
-                        
-                        # Generate and play audio response
-                        tts = gTTS(response['output'], lang='en')
-                        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as temp_audio:
-                            tts.save(temp_audio.name)
-                            st.audio(temp_audio.name)
-                            os.unlink(temp_audio.name)
+                    bot_response = response['output']
+                    st.success(f"Bot: {bot_response}")
                     
-                    # Clear recording
-                    webrtc_ctx.audio_processor.chunks = []
+                    # Generate and play audio response
+                    audio_file = text_to_speech(bot_response)
+                    if audio_file:
+                        st.audio(audio_file)
+                        os.unlink(audio_file)
+                    
+                    # Update chat history
+                    st.session_state.chat_history.append({
+                        "user": customer_input,
+                        "bot": bot_response
+                    })
+                    
+        except Exception as e:
+            st.error(f"Error: {str(e)}")
 
-    with col2:
-        st.subheader("Conversation History")
-        for message in st.session_state.chat_history:
-            st.text(message)
-
-if __name__ == "__main__":
-    main()
+with col2:
+    st.markdown("### 💬 Chat History")
+    for chat in st.session_state.chat_history:
+        st.text_area("You:", chat["user"], height=50, disabled=True)
+        st.text_area("Bot:", chat["bot"], height=50, disabled=True)
+        st.markdown("---")
