@@ -1,4 +1,12 @@
 import streamlit as st
+
+# Page config must be first
+st.set_page_config(
+    page_title="LeChateau Reservation Bot",
+    page_icon="🍽️",
+    layout="wide"
+)
+
 from langchain_groq import ChatGroq
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_community.document_loaders import CSVLoader
@@ -111,13 +119,6 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
-
-# Page config
-st.set_page_config(
-    page_title="LeChateau Reservation Bot",
-    page_icon="🍽️",
-    layout="wide"
-)
 
 # Initialize API keys from Streamlit secrets
 GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
