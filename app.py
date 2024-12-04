@@ -22,141 +22,171 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-    /* Main app background */
+    /* Main app background with rich gradient */
     .stApp {
-        background: linear-gradient(135deg, #002366 0%, #001233 100%);
+        background: linear-gradient(135deg, 
+            #000428 0%, 
+            #004e92 50%,
+            #000428 100%);
     }
     
-    /* Headers */
+    /* Headers with gradient text */
     h1, h2, h3 {
-        color: #FFD700 !important;
+        background: linear-gradient(90deg, #FFD700, #FDB931, #FFD700);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent !important;
         font-family: 'Playfair Display', serif;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         letter-spacing: 1px;
     }
     
-    /* Subheader */
+    /* Subheader with softer gradient */
     .subheader {
-        color: #DAA520 !important;
+        background: linear-gradient(90deg, #DAA520, #FFD700, #DAA520);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent !important;
         font-family: 'Cormorant Garamond', serif;
         font-style: italic;
         letter-spacing: 0.5px;
     }
     
-    /* Text areas */
+    /* Text areas with depth gradient */
     .stTextArea {
-        background: linear-gradient(145deg, #001845 0%, #002366 100%);
-        border: 1px solid #FFD700;
+        background: linear-gradient(145deg, 
+            rgba(0,20,60,0.9) 0%, 
+            rgba(0,40,100,0.9) 50%,
+            rgba(0,20,60,0.9) 100%);
+        border: 1px solid;
+        border-image: linear-gradient(45deg, #FFD700, #DAA520) 1;
         border-radius: 12px;
         color: #FFD700 !important;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
     
-    /* Success messages */
+    /* Success messages with gradient border */
     .st-emotion-cache-16idsys {
-        background: linear-gradient(145deg, #001845, #002366);
-        border: 1px solid #DAA520;
+        background: linear-gradient(145deg,
+            rgba(0,30,80,0.9) 0%,
+            rgba(0,50,120,0.9) 100%);
+        border: 2px solid;
+        border-image: linear-gradient(45deg, #DAA520, #FFD700) 1;
         color: #FFD700;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     }
     
-    /* Info messages */
+    /* Info messages with subtle gradient */
     .st-emotion-cache-16r3i8g {
-        background: linear-gradient(145deg, #002366, #001845);
-        border: 1px solid #FFD700;
+        background: linear-gradient(145deg,
+            rgba(0,40,100,0.9) 0%,
+            rgba(0,60,140,0.9) 100%);
+        border: 2px solid;
+        border-image: linear-gradient(45deg, #FFD700, #DAA520) 1;
         color: #DAA520;
     }
     
-    /* Buttons */
+    /* Buttons with dynamic gradient */
     .stButton button {
-        background: linear-gradient(145deg, #FFD700, #DAA520);
-        color: #001233;
+        background: linear-gradient(45deg, 
+            #FFD700 0%, 
+            #FDB931 50%, 
+            #DAA520 100%);
+        background-size: 200% auto;
+        color: #000428;
         border: none;
         padding: 12px 24px;
         border-radius: 8px;
         font-weight: bold;
         transition: all 0.3s ease;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
     
     .stButton button:hover {
-        background: linear-gradient(145deg, #DAA520, #FFD700);
+        background-position: right center;
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(218,165,32,0.4);
+        box-shadow: 0 6px 20px rgba(218,165,32,0.4);
     }
     
-    /* Audio player */
+    /* Audio player with gradient border */
     .stAudio {
-        background: linear-gradient(145deg, #001845, #002366);
-        border: 1px solid #DAA520;
+        background: linear-gradient(145deg,
+            rgba(0,30,80,0.9) 0%,
+            rgba(0,50,120,0.9) 100%);
+        border: 2px solid;
+        border-image: linear-gradient(45deg, #DAA520, #FFD700) 1;
         border-radius: 12px;
         padding: 15px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
     
-    /* Dividers */
+    /* Animated gradient divider */
     hr {
         border: 0;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, #FFD700, transparent);
+        height: 2px;
+        background: linear-gradient(90deg, 
+            transparent,
+            #FFD700,
+            #FDB931,
+            #DAA520,
+            #FDB931,
+            #FFD700,
+            transparent);
+        background-size: 200% auto;
+        animation: gradient 3s linear infinite;
         margin: 25px 0;
     }
     
-    /* Chat container */
+    /* Chat container with depth */
     .chat-container {
-        background: linear-gradient(145deg, #001845, #002366);
+        background: linear-gradient(145deg,
+            rgba(0,20,60,0.9) 0%,
+            rgba(0,40,100,0.9) 50%,
+            rgba(0,20,60,0.9) 100%);
         border-radius: 16px;
         padding: 25px;
-        border: 1px solid #DAA520;
+        border: 2px solid;
+        border-image: linear-gradient(45deg, #FFD700, #DAA520, #FFD700) 1;
         margin: 15px 0;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
     }
     
-    /* Spinner */
-    .stSpinner {
-        border-color: #FFD700;
-    }
-    
-    /* Scrollbar */
+    /* Gradient scrollbar */
     ::-webkit-scrollbar {
         width: 8px;
-        background: #001233;
+        background: #000428;
     }
     
     ::-webkit-scrollbar-thumb {
-        background: linear-gradient(145deg, #FFD700, #DAA520);
+        background: linear-gradient(45deg, #FFD700, #DAA520);
         border-radius: 4px;
     }
     
-    ::-webkit-scrollbar-thumb:hover {
-        background: linear-gradient(145deg, #DAA520, #FFD700);
-    }
-    
-    /* Text inputs */
-    .stTextInput input {
-        background: linear-gradient(145deg, #001845, #002366);
-        border: 1px solid #DAA520;
-        color: #FFD700;
-        border-radius: 8px;
-        padding: 10px 15px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
-    
-    /* Company branding */
+    /* Company branding with gradient */
     .company-brand {
         text-align: center;
         padding: 20px;
-        color: #DAA520;
+        background: linear-gradient(90deg, #FFD700, #FDB931, #DAA520);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
         font-family: 'Playfair Display', serif;
         font-size: 1.2em;
         letter-spacing: 1px;
         position: fixed;
         bottom: 0;
         width: 100%;
-        background: linear-gradient(90deg, transparent, #001233, transparent);
+        background-color: rgba(0,4,40,0.9);
+    }
+
+    /* Gradient animation */
+    @keyframes gradient {
+        0% {background-position: 0% 50%}
+        50% {background-position: 100% 50%}
+        100% {background-position: 0% 50%}
     }
 </style>
 """, unsafe_allow_html=True)
+
 
 # Initialize API keys from Streamlit secrets
 GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
@@ -313,9 +343,9 @@ with col2:
         st.text_area("Bot:", chat["bot"], height=100, disabled=True)
         st.markdown("---")
 
-# Add company branding at the bottom
+# Add company branding with gradient effect
 st.markdown("""
 <div class='company-brand'>
-    Created by Intellore Systems Private Limited ✨
+    ✨ Created by Intellore Systems Private Limited ✨
 </div>
 """, unsafe_allow_html=True)
