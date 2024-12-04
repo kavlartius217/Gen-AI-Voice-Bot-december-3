@@ -215,7 +215,6 @@ def initialize_llm_tools():
     return llm, [reservation_tool, greeting_tool]
 
 def create_agent(llm, tools):
-    """Create agent with custom prompt"""
     prompt = ChatPromptTemplate.from_messages([
         ("system", "You are a Human like restaurant reservation assistant. Be concise and direct."),
         ("system", "For greetings such as Hi, Hey and Hello: Use the say_hello_tool to respond."),
