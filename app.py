@@ -142,6 +142,7 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
+
 # Initialize API keys from Streamlit secrets
 GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
@@ -292,9 +293,16 @@ with col1:
 
 with col2:
     st.markdown("### 💬 Chat History")
-    for chat in st.session_state.chat_history:
-        st.text_area("You:", chat["user"], height=100, disabled=True)
-        st.text_area("Bot:", chat["bot"], height=100, disabled=True)
+    for idx, chat in enumerate(st.session_state.chat_history):
+        st.text_area("You:", value=chat["user"], height=100, disabled=True, key=f"user_message_{idx}")
+        st.text_area("Bot:", value=chat["bot"], height=100, disabled=True, key=f"bot_response_{idx}")
         st.markdown("---")
+
+# Add company branding
+st.markdown("""
+<div class='company-brand'>
+    Created by Intellore Systems Private Limited
+</div>
+""", unsafe_allow_html=True)
 
 
