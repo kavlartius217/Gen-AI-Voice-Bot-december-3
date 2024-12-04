@@ -19,7 +19,6 @@ st.set_page_config(
     page_icon="🍽️",
     layout="wide"
 )
-
 st.markdown("""
 <style>
     /* Main app background with black gradient */
@@ -190,6 +189,13 @@ st.markdown("""
         color: #FFD700;
     }
 </style>
+""", unsafe_allow_html=True)
+
+# Add company branding with gradient effect
+st.markdown("""
+<div class='company-brand'>
+    ✨ Created by Intellore Systems Private Limited ✨
+</div>
 """, unsafe_allow_html=True)
 
 
