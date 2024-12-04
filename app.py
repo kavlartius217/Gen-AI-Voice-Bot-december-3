@@ -95,7 +95,7 @@ def create_agent(llm, tools):
     prompt = ChatPromptTemplate.from_messages([
         ("system", "You are a restaurant reservation assistant. Be concise and direct."),
         ("system", "For reservations: Check available tables and locations for the specified time."),
-        ("system", "For greetings for example "Hello","Hey": Use the say_hello_tool to respond."),
+        ("system", "For greetings for example Hello,Hey: Use the say_hello_tool to respond."),
         ("system", "For confirmations: Confirm reservation details briefly and end conversation."),
         ("user", "{input}"),
         MessagesPlaceholder(variable_name="agent_scratchpad")
