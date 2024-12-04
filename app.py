@@ -13,6 +13,105 @@ from gtts import gTTS
 import tempfile
 import os
 
+# Custom CSS
+st.markdown("""
+<style>
+    .stApp {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    }
+    
+    h1, h2, h3 {
+        color: #FFD700 !important;
+        font-family: 'Playfair Display', serif;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .subheader {
+        color: #DAA520 !important;
+        font-family: 'Cormorant Garamond', serif;
+        font-style: italic;
+    }
+    
+    .stTextArea {
+        background: linear-gradient(145deg, #2d2d2d 0%, #1a1a1a 100%);
+        border: 1px solid #FFD700;
+        border-radius: 10px;
+        color: #FFD700 !important;
+    }
+    
+    .st-emotion-cache-16idsys {
+        background: linear-gradient(145deg, #1a1a1a, #2d2d2d);
+        border: 1px solid #DAA520;
+        color: #FFD700;
+    }
+    
+    .st-emotion-cache-16r3i8g {
+        background: linear-gradient(145deg, #2d2d2d, #1a1a1a);
+        border: 1px solid #FFD700;
+        color: #DAA520;
+    }
+    
+    .stButton button {
+        background: linear-gradient(145deg, #FFD700, #DAA520);
+        color: #1a1a1a;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+    
+    .stButton button:hover {
+        background: linear-gradient(145deg, #DAA520, #FFD700);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(218,165,32,0.3);
+    }
+    
+    .stAudio {
+        background: linear-gradient(145deg, #2d2d2d, #1a1a1a);
+        border: 1px solid #DAA520;
+        border-radius: 10px;
+        padding: 10px;
+    }
+    
+    hr {
+        border: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #FFD700, transparent);
+        margin: 20px 0;
+    }
+    
+    .chat-container {
+        background: linear-gradient(145deg, #1a1a1a, #2d2d2d);
+        border-radius: 15px;
+        padding: 20px;
+        border: 1px solid #DAA520;
+        margin: 10px 0;
+    }
+    
+    .stSpinner {
+        border-color: #FFD700;
+    }
+    
+    ::-webkit-scrollbar {
+        width: 10px;
+        background: #1a1a1a;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: linear-gradient(145deg, #FFD700, #DAA520);
+        border-radius: 5px;
+    }
+    
+    .stTextInput input {
+        background: linear-gradient(145deg, #2d2d2d, #1a1a1a);
+        border: 1px solid #DAA520;
+        color: #FFD700;
+        border-radius: 5px;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # Page config
 st.set_page_config(
     page_title="LeChateau Reservation Bot",
