@@ -246,30 +246,30 @@ agent_executor = create_agent(llm, tools)
 col1, col2 = st.columns([2, 1])
 
 with col1:
+    with col1:
     # Audio recording
     audio_value = st.audio_input("Speak your request")
     
-    if audio_value is not None:  # Check if audio was actually recorded
+    if audio_value is not None:
         st.success("Audio recorded successfully!")
         st.audio(audio_value)
         
         # Process audio with Gemini
         try:
-            # Create temp file with explicit cleanup
-            temp_dir = tempfile.mkdtemp()
-            temp_path = os.path.join(temp_dir, "temp_audio.wav")
-            
-            # Write audio data to temp file
-            with open(temp_path, 'wb') as audio_file:
-                audio_bytes = audio_value.read()  # Read the audio data
-                audio_file.write(audio_bytes)
-            
-            try:
+            # Directly use the audio data without extra temp files
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp_file:
+                audio_bytes = audio_value.read()
+                tmp_file.write(audio_bytes)
+                tmp_file.flush()  # Ensure all data is written
+                
                 # Use Gemini for transcription
-                audio_file = genai.upload_file(temp_path)
+                audio_file = genai.upload_file(tmp_file.name)
                 model = genai.GenerativeModel("gemini-1.5-flash")
                 result = model.generate_content([audio_file, "transcribe the audio as it is"])
                 customer_input = result.text
+                
+                # Clean up immediately after transcription
+                os.unlink(tmp_file.name)
                 
                 st.info(f"You said: {customer_input}")
                 
@@ -294,12 +294,6 @@ with col1:
                         "user": customer_input,
                         "bot": bot_response
                     })
-            
-            finally:
-                # Clean up temp files
-                if os.path.exists(temp_path):
-                    os.remove(temp_path)
-                os.rmdir(temp_dir)
                     
         except Exception as e:
             st.error(f"Error: {str(e)}")
