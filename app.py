@@ -21,66 +21,66 @@ st.set_page_config(
 )
 st.markdown("""
 <style>
-    /* Main app background */
+    /* Main app background - matching Amazon gradient */
     .stApp {
         background: linear-gradient(135deg, 
-            #0A2F23 0%, 
-            #0B3B2C 50%,
-            #0A2F23 100%);
+            #000000 0%, 
+            #004D2C 100%);
     }
     
-    /* Headers - clean white */
+    /* Headers - bolder white */
     h1, h2, h3 {
         color: #FFFFFF !important;
         font-family: 'Inter', sans-serif;
-        font-weight: 500;
-        letter-spacing: 0.5px;
+        font-weight: 700;
+        letter-spacing: 0px;
     }
     
     /* Subheader */
     .subheader {
-        color: #E0E0E0 !important;
+        color: #FFFFFF !important;
         font-family: 'Inter', sans-serif;
-        letter-spacing: 0.5px;
-        font-weight: 400;
+        font-weight: 600;
+        opacity: 0.9;
     }
     
     /* Text areas */
     .stTextArea {
         background: linear-gradient(145deg, 
-            rgba(8, 41, 30, 0.95) 0%, 
-            rgba(11, 59, 44, 0.95) 100%);
+            rgba(0, 51, 30, 0.95) 0%, 
+            rgba(0, 77, 44, 0.95) 100%);
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 8px;
         color: #FFFFFF !important;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        font-weight: 500;
     }
     
     /* Success messages */
     .st-emotion-cache-16idsys {
-        background: rgba(11, 59, 44, 0.9);
+        background: rgba(0, 77, 44, 0.9);
         border: 1px solid rgba(255, 255, 255, 0.1);
         color: #FFFFFF;
+        font-weight: 500;
     }
     
     /* Info messages */
     .st-emotion-cache-16r3i8g {
-        background: rgba(8, 41, 30, 0.9);
+        background: rgba(0, 51, 30, 0.9);
         border: 1px solid rgba(255, 255, 255, 0.1);
-        color: #E0E0E0;
+        color: #FFFFFF;
+        font-weight: 500;
     }
     
     /* Buttons */
     .stButton button {
         background: #FFFFFF;
-        color: #0A2F23;
+        color: #004D2C;
         border: none;
         padding: 12px 24px;
         border-radius: 6px;
         font-family: 'Inter', sans-serif;
-        font-weight: 500;
+        font-weight: 600;
         transition: all 0.3s ease;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
     
     .stButton button:hover {
@@ -91,36 +91,27 @@ st.markdown("""
     
     /* Audio player */
     .stAudio {
-        background: rgba(8, 41, 30, 0.95);
+        background: rgba(0, 51, 30, 0.95);
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 8px;
         padding: 15px;
     }
     
-    /* Divider */
-    hr {
-        border: 0;
-        height: 1px;
-        background: rgba(255, 255, 255, 0.1);
-        margin: 20px 0;
-    }
-    
     /* Chat container */
     .chat-container {
         background: linear-gradient(145deg,
-            rgba(8, 41, 30, 0.95) 0%,
-            rgba(11, 59, 44, 0.95) 100%);
+            rgba(0, 51, 30, 0.95) 0%,
+            rgba(0, 77, 44, 0.95) 100%);
         border-radius: 8px;
         padding: 20px;
         border: 1px solid rgba(255, 255, 255, 0.1);
         margin: 15px 0;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
     
     /* Scrollbar */
     ::-webkit-scrollbar {
         width: 6px;
-        background: #0A2F23;
+        background: #000000;
     }
     
     ::-webkit-scrollbar-thumb {
@@ -135,17 +126,19 @@ st.markdown("""
         color: #FFFFFF;
         font-family: 'Inter', sans-serif;
         font-size: 0.9em;
+        font-weight: 600;
         letter-spacing: 0.5px;
         position: fixed;
         bottom: 0;
         width: 100%;
-        background: rgba(8, 41, 30, 0.95);
+        background: rgba(0, 51, 30, 0.95);
     }
 
     /* Regular text */
     .stMarkdown {
         color: #FFFFFF;
         font-family: 'Inter', sans-serif;
+        font-weight: 500;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -156,7 +149,6 @@ st.markdown("""
     Created by Intellore Systems Private Limited
 </div>
 """, unsafe_allow_html=True)
-
 # Initialize API keys from Streamlit secrets
 GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
