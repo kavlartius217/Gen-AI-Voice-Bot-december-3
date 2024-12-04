@@ -246,6 +246,7 @@ agent_executor = create_agent(llm, tools)
 col1, col2 = st.columns([2, 1])
 
 with col1:
+     audio_value = st.audio_input("Speak your request")
    # In the audio processing section, modify like this:
     if audio_value:
       st.success("Audio recorded successfully!")
