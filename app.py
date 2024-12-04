@@ -21,183 +21,141 @@ st.set_page_config(
 )
 st.markdown("""
 <style>
-    /* Main app background with black gradient */
+    /* Main app background */
     .stApp {
         background: linear-gradient(135deg, 
-            #000000 0%, 
-            #1a1a1a 50%,
-            #000000 100%);
+            #0A2F23 0%, 
+            #0B3B2C 50%,
+            #0A2F23 100%);
     }
     
-    /* Headers with gradient text */
+    /* Headers - clean white */
     h1, h2, h3 {
-        background: linear-gradient(90deg, #FFD700, #FDB931, #FFD700);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent !important;
-        font-family: 'Playfair Display', serif;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        letter-spacing: 1px;
-    }
-    
-    /* Subheader with softer gradient */
-    .subheader {
-        background: linear-gradient(90deg, #DAA520, #FFD700, #DAA520);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent !important;
-        font-family: 'Cormorant Garamond', serif;
-        font-style: italic;
+        color: #FFFFFF !important;
+        font-family: 'Inter', sans-serif;
+        font-weight: 500;
         letter-spacing: 0.5px;
     }
     
-    /* Text areas with depth gradient */
+    /* Subheader */
+    .subheader {
+        color: #E0E0E0 !important;
+        font-family: 'Inter', sans-serif;
+        letter-spacing: 0.5px;
+        font-weight: 400;
+    }
+    
+    /* Text areas */
     .stTextArea {
         background: linear-gradient(145deg, 
-            rgba(0,0,0,0.9) 0%, 
-            rgba(26,26,26,0.9) 50%,
-            rgba(0,0,0,0.9) 100%);
-        border: 1px solid;
-        border-image: linear-gradient(45deg, #FFD700, #DAA520) 1;
-        border-radius: 12px;
-        color: #FFD700 !important;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            rgba(8, 41, 30, 0.95) 0%, 
+            rgba(11, 59, 44, 0.95) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        color: #FFFFFF !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
     
-    /* Success messages with gradient border */
+    /* Success messages */
     .st-emotion-cache-16idsys {
-        background: linear-gradient(145deg,
-            rgba(0,0,0,0.9) 0%,
-            rgba(26,26,26,0.9) 100%);
-        border: 2px solid;
-        border-image: linear-gradient(45deg, #DAA520, #FFD700) 1;
-        color: #FFD700;
+        background: rgba(11, 59, 44, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #FFFFFF;
     }
     
-    /* Info messages with subtle gradient */
+    /* Info messages */
     .st-emotion-cache-16r3i8g {
-        background: linear-gradient(145deg,
-            rgba(26,26,26,0.9) 0%,
-            rgba(51,51,51,0.9) 100%);
-        border: 2px solid;
-        border-image: linear-gradient(45deg, #FFD700, #DAA520) 1;
-        color: #DAA520;
+        background: rgba(8, 41, 30, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #E0E0E0;
     }
     
-    /* Buttons with dynamic gradient */
+    /* Buttons */
     .stButton button {
-        background: linear-gradient(45deg, 
-            #FFD700 0%, 
-            #FDB931 50%, 
-            #DAA520 100%);
-        background-size: 200% auto;
-        color: #000000;
+        background: #FFFFFF;
+        color: #0A2F23;
         border: none;
         padding: 12px 24px;
-        border-radius: 8px;
-        font-weight: bold;
+        border-radius: 6px;
+        font-family: 'Inter', sans-serif;
+        font-weight: 500;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
     
     .stButton button:hover {
-        background-position: right center;
+        background: #F0F0F0;
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(218,165,32,0.4);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
     
-    /* Audio player with gradient border */
+    /* Audio player */
     .stAudio {
-        background: linear-gradient(145deg,
-            rgba(0,0,0,0.9) 0%,
-            rgba(26,26,26,0.9) 100%);
-        border: 2px solid;
-        border-image: linear-gradient(45deg, #DAA520, #FFD700) 1;
-        border-radius: 12px;
+        background: rgba(8, 41, 30, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
         padding: 15px;
+    }
+    
+    /* Divider */
+    hr {
+        border: 0;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.1);
+        margin: 20px 0;
+    }
+    
+    /* Chat container */
+    .chat-container {
+        background: linear-gradient(145deg,
+            rgba(8, 41, 30, 0.95) 0%,
+            rgba(11, 59, 44, 0.95) 100%);
+        border-radius: 8px;
+        padding: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        margin: 15px 0;
         box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
     
-    /* Animated gradient divider */
-    hr {
-        border: 0;
-        height: 2px;
-        background: linear-gradient(90deg, 
-            transparent,
-            #FFD700,
-            #FDB931,
-            #DAA520,
-            #FDB931,
-            #FFD700,
-            transparent);
-        background-size: 200% auto;
-        animation: gradient 3s linear infinite;
-        margin: 25px 0;
-    }
-    
-    /* Chat container with depth */
-    .chat-container {
-        background: linear-gradient(145deg,
-            rgba(0,0,0,0.9) 0%,
-            rgba(26,26,26,0.9) 50%,
-            rgba(0,0,0,0.9) 100%);
-        border-radius: 16px;
-        padding: 25px;
-        border: 2px solid;
-        border-image: linear-gradient(45deg, #FFD700, #DAA520, #FFD700) 1;
-        margin: 15px 0;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-    }
-    
-    /* Gradient scrollbar */
+    /* Scrollbar */
     ::-webkit-scrollbar {
-        width: 8px;
-        background: #000000;
+        width: 6px;
+        background: #0A2F23;
     }
     
     ::-webkit-scrollbar-thumb {
-        background: linear-gradient(45deg, #FFD700, #DAA520);
-        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 3px;
     }
     
-    /* Company branding with gradient */
+    /* Company branding */
     .company-brand {
         text-align: center;
-        padding: 20px;
-        background: linear-gradient(90deg, #FFD700, #FDB931, #DAA520);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-        font-family: 'Playfair Display', serif;
-        font-size: 1.2em;
-        letter-spacing: 1px;
+        padding: 15px;
+        color: #FFFFFF;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9em;
+        letter-spacing: 0.5px;
         position: fixed;
         bottom: 0;
         width: 100%;
-        background-color: rgba(0,0,0,0.9);
+        background: rgba(8, 41, 30, 0.95);
     }
 
-    /* Gradient animation */
-    @keyframes gradient {
-        0% {background-position: 0% 50%}
-        50% {background-position: 100% 50%}
-        100% {background-position: 0% 50%}
-    }
-
-    /* Additional text styling */
+    /* Regular text */
     .stMarkdown {
-        color: #FFD700;
+        color: #FFFFFF;
+        font-family: 'Inter', sans-serif;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# Add company branding with gradient effect
+# Add company branding
 st.markdown("""
 <div class='company-brand'>
-    ✨ Created by Intellore Systems Private Limited ✨
+    Created by Intellore Systems Private Limited
 </div>
 """, unsafe_allow_html=True)
-
 
 # Initialize API keys from Streamlit secrets
 GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
