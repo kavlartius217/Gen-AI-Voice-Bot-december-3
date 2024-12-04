@@ -169,9 +169,9 @@ def initialize_llm_tools():
     """Initialize LLM and tools"""
     # Initialize Groq LLM (faster than OpenAI)
     llm = ChatGroq(
-        model_name="gemma2-9b-it",
+        model_name="mixtral-8x7b-32768",
         api_key=GROQ_API_KEY,
-        temperature=0.7
+        temperature=0.3
     )
     
     # Initialize embeddings
@@ -203,7 +203,7 @@ def initialize_llm_tools():
     def say_hello(customer_input):
         if any(greeting in customer_input.lower() for greeting in ["Hello", "Hey", "Hi"]):
             return "Hello! Welcome to LeChateau. How can I help you today?"
-        return None
+        
     
     greeting_tool = Tool.from_function(
         func=say_hello,
@@ -216,7 +216,7 @@ def initialize_llm_tools():
 def create_agent(llm, tools):
     prompt = ChatPromptTemplate.from_messages([
         ("system", "You are a Human like restaurant reservation assistant. Be concise and direct and always follow the prompt."),
-        ("system", "For greetings such as Hi, Hey and Hello: Use the say_hello_tool to respond."),
+        ("system", "For greetings Hi, Hey and Hello: Use the say_hello_tool to respond."),
         ("system", "When the user specifies the number of people and the time to make a reservation: Check the reservation_data_tool for the tables availabe during the specified time as well as the locations of these tables and convey this information to the user."),
         ("system", "After the user has chosen a table from the provided options: Confirm reservation details briefly and end conversation."),
         ("user", "{input}"),
