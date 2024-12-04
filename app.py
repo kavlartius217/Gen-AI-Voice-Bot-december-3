@@ -246,60 +246,63 @@ agent_executor = create_agent(llm, tools)
 col1, col2 = st.columns([2, 1])
 
 with col1:
+    # Audio recording
     audio_value = st.audio_input("Speak your request")
-   # In the audio processing section, modify like this:
-    if audio_value:
-      st.success("Audio recorded successfully!")
-      st.audio(audio_value)
     
-    # Process audio with Gemini
-    try:
-        # Create temp file with explicit cleanup
-        temp_dir = tempfile.mkdtemp()
-        temp_path = os.path.join(temp_dir, "temp_audio.wav")
+    if audio_value is not None:  # Check if audio was actually recorded
+        st.success("Audio recorded successfully!")
+        st.audio(audio_value)
         
-        with open(temp_path, 'wb') as audio_file:
-            audio_file.write(audio_value.getvalue())
-        
+        # Process audio with Gemini
         try:
-            # Use Gemini for transcription
-            audio_file = genai.upload_file(temp_path)
-            model = genai.GenerativeModel("gemini-1.5-flash")
-            result = model.generate_content([audio_file, "transcribe the audio as it is"])
-            customer_input = result.text
+            # Create temp file with explicit cleanup
+            temp_dir = tempfile.mkdtemp()
+            temp_path = os.path.join(temp_dir, "temp_audio.wav")
             
-            st.info(f"You said: {customer_input}")
+            # Write audio data to temp file
+            with open(temp_path, 'wb') as audio_file:
+                audio_bytes = audio_value.read()  # Read the audio data
+                audio_file.write(audio_bytes)
             
-            # Generate response
-            with st.spinner("Processing..."):
-                response = agent_executor.invoke({
-                    "input": customer_input,
-                    "chat_history": st.session_state.chat_history
-                })
+            try:
+                # Use Gemini for transcription
+                audio_file = genai.upload_file(temp_path)
+                model = genai.GenerativeModel("gemini-1.5-flash")
+                result = model.generate_content([audio_file, "transcribe the audio as it is"])
+                customer_input = result.text
                 
-                bot_response = response['output']
-                st.success(f"Bot: {bot_response}")
+                st.info(f"You said: {customer_input}")
                 
-                # Generate and play audio response
-                audio_file = text_to_speech(bot_response)
-                if audio_file:
-                    st.audio(audio_file)
-                    os.unlink(audio_file)
-                
-                # Update chat history
-                st.session_state.chat_history.append({
-                    "user": customer_input,
-                    "bot": bot_response
-                })
-        
-        finally:
-            # Clean up temp files
-            if os.path.exists(temp_path):
-                os.remove(temp_path)
-            os.rmdir(temp_dir)
-                
-    except Exception as e:
-        st.error(f"Error: {str(e)}")
+                # Generate response
+                with st.spinner("Processing..."):
+                    response = agent_executor.invoke({
+                        "input": customer_input,
+                        "chat_history": st.session_state.chat_history
+                    })
+                    
+                    bot_response = response['output']
+                    st.success(f"Bot: {bot_response}")
+                    
+                    # Generate and play audio response
+                    audio_file = text_to_speech(bot_response)
+                    if audio_file:
+                        st.audio(audio_file)
+                        os.unlink(audio_file)
+                    
+                    # Update chat history
+                    st.session_state.chat_history.append({
+                        "user": customer_input,
+                        "bot": bot_response
+                    })
+            
+            finally:
+                # Clean up temp files
+                if os.path.exists(temp_path):
+                    os.remove(temp_path)
+                os.rmdir(temp_dir)
+                    
+        except Exception as e:
+            st.error(f"Error: {str(e)}")
 
 with col2:
     st.markdown("### 💬 Chat History")
