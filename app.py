@@ -298,11 +298,5 @@ with col2:
         st.text_area("Bot:", value=chat["bot"], height=100, disabled=True, key=f"bot_response_{idx}")
         st.markdown("---")
 
-# Add company branding
-st.markdown("""
-<div class='company-brand'>
-    Created by Intellore Systems Private Limited
-</div>
-""", unsafe_allow_html=True)
 
 
