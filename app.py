@@ -228,10 +228,9 @@ def create_agent(llm, tools):
      - Table [number]: [location]
      - Table [number]: [location]'
 
-3. TABLE SELECTION:
-   - When the user chooses a table from the provided options: MUST confirm reservation details only
-   - Format: 'Confirmed: Table [number] at [location] for [count] people at [time]'
-   - End conversation after confirmation
+3. When customer selects a table:
+   - Confirm the reservation with all details
+   - Format: "Confirmed: Table [number] at [location] for [count] people at [time]"
 
 DO NOT engage in general conversation or deviate from these exact steps."""),
     ("user", "{input}"),
