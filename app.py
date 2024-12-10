@@ -243,7 +243,7 @@ DO NOT engage in general conversation or deviate from these exact steps."""),
         agent=agent,
         tools=tools,
         llm=llm,
-        temperature=0.5,
+        temperature=0.3,
         handle_parsing_errors=True,
         verbose=True,
         max_iterations=10  # Reduced for faster response
