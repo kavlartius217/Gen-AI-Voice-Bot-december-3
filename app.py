@@ -279,7 +279,7 @@ with col1:
                 # Use Gemini for transcription
                 audio_file = genai.upload_file(tmp_file.name)
                 model = genai.GenerativeModel("gemini-1.5-flash")
-                result = model.generate_content([audio_file, "Transcribe this audio exactly as spoken, word for word, without any translation or modification in English"])
+                result = model.generate_content([audio_file, "Transcribe this audio in english exactly word to word"])
                 customer_input = result.text
                 
                 # Clean up immediately after transcription
